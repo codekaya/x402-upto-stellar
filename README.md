@@ -88,6 +88,15 @@ stellar keys generate --global deployer --network testnet --fund
 make deploy NETWORK=testnet SOURCE=deployer
 ```
 
+## Deployments
+
+| Network | Contract | Deployed |
+|---|---|---|
+| Testnet | [`CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB`](https://stellar.expert/explorer/testnet/contract/CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB) | [tx](https://stellar.expert/explorer/testnet/tx/c838a72ac74fad5735f1807ad0ee1761143f6faad0fb76f29ec9d3eaa2920a5e) |
+
+Read the live interface with
+`stellar contract info interface --id CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB --network testnet`.
+
 ## Status
 
 The settlement contract and its test suite are complete and green, and the
