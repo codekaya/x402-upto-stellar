@@ -193,7 +193,7 @@ The criteria the award is measured against:
 - [x] Settlement returns a hash on success and the mapped reason on each error
 - [x] A payload failing the registry check is refused
 - [x] The conformance runner reports every case passing against testnet
-- [ ] Client package published at v0.1.0 with types, tests and README (built, packed and tested; publication waits on the maintainer's npm login)
+- [x] Client package published at v0.1.0 with types, tests and README: `@codekaya/x402-upto-stellar`
 - [x] The metered service completes a cycle below the cap, hash published
 
 ## Chapter obligations, not billed

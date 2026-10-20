@@ -48,7 +48,7 @@ Every other transaction is in the [on-chain record](#on-chain-record).
 | Settlement returns a hash on success and the mapped reason on each error | done: 7 settle cases, same file |
 | A payload failing the registry check is refused | done: case `contract-not-canonical` |
 | The conformance runner reports every case passing against testnet | done: 34 / 34 |
-| Client package published at v0.1.0 with types, tests and README | built and packed, 45 tests; npm publication pending the maintainer's npm login |
+| Client package published at v0.1.0 with types, tests and README | done: [`@codekaya/x402-upto-stellar@0.1.0`](https://www.npmjs.com/package/@codekaya/x402-upto-stellar), 45 tests |
 | The metered service completes a cycle below the cap, hash published | done: [evidence](#evidence) |
 
 ## Why a contract is needed
