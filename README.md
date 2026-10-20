@@ -68,6 +68,7 @@ specs/
 spikes/
   01-two-signers/          payer signs offline, settler submits: settle_signed on testnet
   02-network-id/           what network_id() returns on-chain, and a refusal landed with a hash
+  03-ground-rules/         the exact/* and upto/* interfaces to mirror, the token, the local model
 ```
 
 ## Getting started
@@ -114,6 +115,12 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | Spike 2: network-id probe wasm uploaded | [`492a7684…`](https://stellar.expert/explorer/testnet/tx/492a76846ac352edacb721118323304d84fe88105d86f85e331f7211df3e7094) |
 | 2026-10-20 | Spike 2: probe deployed as `CAEZC6F4DKZJU5IEOLBQ5XKQWGCNZA6U45KHPKEDKPB35UF3DJCK4WMX` | [`078a7a46…`](https://stellar.expert/explorer/testnet/tx/078a7a46ab1e536178f56544867f3be4251ac6b43695e3e8d904d9674bbdc7b3) |
 | 2026-10-20 | Spike 2: refusal landed on-chain, `require_network(pubnet id)` failed with `Error(Contract, #1)` | [`3ef1d4ba…`](https://stellar.expert/explorer/testnet/tx/3ef1d4baaa0d0ed0dc50cc662a444a5a1cd8a630755728baf3f768814d323c0c) |
+| 2026-10-20 | Spike 3 setup: payer USDC trustline and 100 XLM → USDC on the DEX | [`8a4367ff…`](https://stellar.expert/explorer/testnet/tx/8a4367ff4526baf56de47897f5e9d7b1d21d1313c62964369ea3659859b395bf) |
+| 2026-10-20 | Spike 3 setup: payee USDC trustline | [`ea7520fc…`](https://stellar.expert/explorer/testnet/tx/ea7520fca72d7e94354a79ebc210bd08c30227bd5defc0f80e29bd9c9dca78bd) |
+| 2026-10-20 | Spike 3: `settle_signed` on testnet USDC, 2 of 5 paid, 3 refunded; created the contract's USDC balance entry | [`4df50792…`](https://stellar.expert/explorer/testnet/tx/4df50792a16a6f778c814e25e17d5b5b6df28adc6bb404d4524d733040c1ca83) |
+| 2026-10-20 | Spike 3 setup: second payer USDC trustline and purchase | [`73458e38…`](https://stellar.expert/explorer/testnet/tx/73458e3800cd8b210201fdbaecb9eced648c29a04e13426234745c29f8040287) |
+| 2026-10-20 | Spike 3 setup: second payee USDC trustline | [`ff395aed…`](https://stellar.expert/explorer/testnet/tx/ff395aedb6f78fdbef6c2d87a8caf9406bb881ff99bdaf840f9aefd021dc46f0) |
+| 2026-10-20 | Spike 3: `settle_signed` on testnet USDC, warm, 0.003 XLM fee | [`bc2b0093…`](https://stellar.expert/explorer/testnet/tx/bc2b00938a8670cba8b6be61b6da45fe672e08a6f717f6a49792eeb4c76ba3b5) |
 
 ## Status
 

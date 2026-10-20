@@ -34,6 +34,11 @@ payer's authorization entry and the settler's own signature.
 Target: one settlement on testnet where the payee is paid, the remainder
 returns to the payer, and neither signer could have changed the other's half.
 
+If it fails, the one-shot HTTP path is unreachable from a browser or an agent
+and the sprint pivots to the session path: the payer submits `lock` themselves
+and the facilitator only calls `settle`. All three deliverables survive; the
+client gets simpler and the facilitator gains an endpoint.
+
 **Done 20 October: it works.** One settlement on testnet, payee paid, remainder
 refunded, both tamper directions refused. Three findings feed the sprint: an
 exact replay surfaces as `Error(Auth, ExistingValue)` rather than
@@ -41,11 +46,6 @@ exact replay surfaces as `Error(Auth, ExistingValue)` rather than
 credentials, and the settlement contract's instance and wasm had been archived, now
 extended to about April 2027. Details in
 [`spikes/01-two-signers`](../spikes/01-two-signers/README.md).
-
-If it fails, the one-shot HTTP path is unreachable from a browser or an agent
-and the sprint pivots to the session path: the payer submits `lock` themselves
-and the facilitator only calls `settle`. All three deliverables survive; the
-client gets simpler and the facilitator gains an endpoint.
 
 **Spike 2. Reading the network identity inside a contract.** Confirm
 `env.ledger().network_id()` is what a record should be keyed against, so a
@@ -66,6 +66,13 @@ write down the interfaces to mirror. Pick the settlement token on testnet: the
 published USDC SAC if it is usable, otherwise deploy a test SAC and say so.
 Stand up the local model the metered demo will proxy, so the meter has
 something real to count without paid credits.
+
+**Partly done 20 October.** Interfaces: mirror the `upto/{client,server,facilitator}`
+triplet that `@x402/evm` and `@x402/svm` already ship, on `@x402/core` v2
+types, which means the spec has to be rebased from v1 first. Token: Circle's
+testnet USDC SAC, usable and settled through. SDK: `^16.3`, matching
+`@x402/stellar`. Local model: still open. Details in
+[`spikes/03-ground-rules`](../spikes/03-ground-rules/README.md).
 
 ## Deliverable 1, registry contract, 28 hours
 

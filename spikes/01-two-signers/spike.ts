@@ -8,8 +8,9 @@
  * its source account and submits it against the live contract on testnet.
  *
  * Throwaway accounts are generated and funded through friendbot on every run;
- * no secret is written anywhere. The token is the native XLM SAC, which every
- * funded account can spend without a trustline.
+ * no secret is written anywhere. The token is the native XLM SAC by default,
+ * which needs no trustline; `SPIKE_TOKEN=usdc` runs the same flow on Circle's
+ * testnet USDC SAC, buying the payer's USDC on the testnet DEX first.
  */
 import { randomBytes } from "node:crypto";
 import {
@@ -36,10 +37,13 @@ const PASSPHRASE = Networks.TESTNET;
 const EXPLORER = "https://stellar.expert/explorer/testnet";
 
 const UPTO = "CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB";
-const TOKEN = Asset.native().contractId(PASSPHRASE);
+const USDC = new Asset("USDC", "GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5");
+const ON_USDC = process.env.SPIKE_TOKEN === "usdc";
+const TOKEN = (ON_USDC ? USDC : Asset.native()).contractId(PASSPHRASE);
+const UNIT = ON_USDC ? "USDC" : "XLM";
 
-const CAP = 50_000_000n; // 5 XLM, the ceiling the payer authorizes
-const SETTLED = 20_000_000n; // 2 XLM, what the meter says was used
+const CAP = 50_000_000n; // 5 units, the ceiling the payer authorizes
+const SETTLED = 20_000_000n; // 2 units, what the meter says was used
 const WINDOW_SECONDS = 600n;
 const SECONDS_PER_LEDGER = 5n;
 
@@ -236,6 +240,22 @@ async function fund(kp: Keypair): Promise<void> {
   if (!res.ok) throw new Error(`friendbot ${res.status} for ${kp.publicKey()}`);
 }
 
+/** Submits a classic transaction. Used only to set up the USDC accounts. */
+async function classic(kp: Keypair, ops: xdr.Operation[]): Promise<string> {
+  const builder = new TransactionBuilder(await server.getAccount(kp.publicKey()), {
+    fee: BASE_FEE,
+    networkPassphrase: PASSPHRASE,
+  });
+  ops.forEach((op) => builder.addOperation(op));
+  const tx = builder.setTimeout(60).build();
+  tx.sign(kp);
+  const sent = await server.sendTransaction(tx);
+  if (sent.status !== "PENDING") throw new Error(`setup: ${sent.status} ${sent.errorResult?.result.type}`);
+  const final = await server.pollTransaction(sent.hash, { attempts: 30 });
+  if (final.status !== rpc.Api.GetTransactionStatus.SUCCESS) throw new Error(`setup ${final.status}`);
+  return sent.hash;
+}
+
 async function view(source: string, contract: string, fn: string, args: xdr.ScVal[]) {
   const account = await server.getAccount(source);
   const tx = new TransactionBuilder(account, { fee: BASE_FEE, networkPassphrase: PASSPHRASE })
@@ -249,7 +269,7 @@ async function view(source: string, contract: string, fn: string, args: xdr.ScVa
   return scValToNative(sim.result.retval);
 }
 
-const xlm = (stroops: bigint) => `${(Number(stroops) / 1e7).toFixed(7)} XLM`;
+const xlm = (stroops: bigint) => `${(Number(stroops) / 1e7).toFixed(7)} ${UNIT}`;
 
 let failures = 0;
 function check(label: string, ok: boolean, detail = "") {
@@ -268,7 +288,17 @@ async function main() {
   console.log(`  payer    ${payer.publicKey()}`);
   console.log(`  payee    ${payee.publicKey()}`);
   console.log(`  settler  ${settler.publicKey()}`);
-  console.log(`  token    ${TOKEN} (native XLM SAC)`);
+  console.log(`  token    ${TOKEN} (${ON_USDC ? "Circle testnet USDC SAC" : "native XLM SAC"})`);
+  if (ON_USDC) {
+    // Setup, not protocol: in the real flow the payer already holds USDC.
+    const bought = await classic(payer, [
+      Operation.changeTrust({ asset: USDC }),
+      Operation.pathPaymentStrictSend({ sendAsset: Asset.native(), sendAmount: "100", destination: payer.publicKey(), destAsset: USDC, destMin: "6", path: [] }),
+    ]);
+    const trusted = await classic(payee, [Operation.changeTrust({ asset: USDC })]);
+    console.log(`  setup    payer trustline + 100 XLM -> USDC ${bought}`);
+    console.log(`           payee trustline ${trusted}`);
+  }
   console.log(`  upto     ${UPTO}`);
 
   const latest = await server.getLatestLedger();

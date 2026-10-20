@@ -4,7 +4,8 @@
   "type": "module",
   "description": "Spike 1: payer signs settle_signed offline with authorizeEntry, settler submits",
   "scripts": {
-    "spike": "tsx spike.ts"
+    "spike": "tsx spike.ts",
+    "spike:usdc": "SPIKE_TOKEN=usdc tsx spike.ts"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "17.2.1"

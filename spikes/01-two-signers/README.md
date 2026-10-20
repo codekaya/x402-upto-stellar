@@ -27,12 +27,15 @@ payer's authorization entry and the settler's own signature?
    simulates in enforcing mode, signs the envelope and submits.
 
 Accounts are generated and funded through friendbot on every run, so no secret
-is stored. The token is the native XLM SAC, which needs no trustline. Choosing
-the sprint's settlement token is Spike 3.
+is stored. The token is the native XLM SAC, which needs no trustline.
+`npm run spike:usdc` runs the identical flow on Circle's testnet USDC, which
+Spike 3 picked as the sprint's settlement token, buying the payer's USDC on the
+testnet DEX first. Both pass every check below.
 
 ```bash
 npm install
-npm run spike
+npm run spike        # native XLM
+npm run spike:usdc   # testnet USDC
 ```
 
 ## Checks, all passing
@@ -63,6 +66,8 @@ the amount.
 |---|---|---|
 | 2026-10-20 | Settlement 2 of 5 XLM, contract cold (instance and wasm restored in the same tx) | [`a8917bfe…`](https://stellar.expert/explorer/testnet/tx/a8917bfeb6b77cef1b028c56ebef743ac39193d5bfa7bdbfaeec8e7d189d2399) |
 | 2026-10-20 | Settlement 2 of 5 XLM, contract warm | [`2380de64…`](https://stellar.expert/explorer/testnet/tx/2380de648f78d01b16ca5b98a6623d3cb88c918d48718b3542f7d76ca290e6a1) |
+| 2026-10-20 | Settlement 2 of 5 USDC, first in the token (creates the contract's USDC balance entry) | [`4df50792…`](https://stellar.expert/explorer/testnet/tx/4df50792a16a6f778c814e25e17d5b5b6df28adc6bb404d4524d733040c1ca83) |
+| 2026-10-20 | Settlement 2 of 5 USDC, warm | [`bc2b0093…`](https://stellar.expert/explorer/testnet/tx/bc2b00938a8670cba8b6be61b6da45fe672e08a6f717f6a49792eeb4c76ba3b5) |
 
 ## Findings that change the plan
 
@@ -105,5 +110,5 @@ One `settle_signed` with a refund, five token movements in all:
 | Disk read | 288 B |
 | Write | 720 B |
 | Resource fee, simulated | 35,726 stroops |
-| Fee charged after refund | 29,016 stroops (0.0029 XLM) |
+| Fee charged after refund | 29,016 stroops (0.0029 XLM); 30,516 on USDC |
 | `X-PAYMENT` header | 2,556 base64 characters |
