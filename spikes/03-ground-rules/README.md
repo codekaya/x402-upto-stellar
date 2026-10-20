@@ -6,8 +6,8 @@ token to settle in, and what the metered demo runs on.
 
 **Results.** Mirror the `upto` triplet that EVM and SVM already ship, on
 `@x402/core` v2 types. Settle in Circle's testnet USDC. Target
-`@stellar/stellar-sdk` 16, as `@x402/stellar` does. The local model is still
-open, pending a runtime install.
+`@stellar/stellar-sdk` 16, as `@x402/stellar` does. The metered demo proxies
+`qwen2.5:0.5b` on Ollama, which reports the tokens it produced.
 
 ## 1. The interfaces to mirror
 
@@ -131,9 +131,32 @@ asset `@x402/stellar` uses for `stellar:testnet`. No test SAC is needed.
 
 ## 5. The local model
 
-Open. The machine is an Apple M2 with 16 GB, enough for a small model, but no
-runtime is installed (no Ollama, llama.cpp, LM Studio or MLX). Proposed:
-Ollama with a sub-2 GB model, because its responses already report the tokens
-produced (`eval_count`, or `usage.completion_tokens` on the OpenAI-compatible
-endpoint). That count is exactly what the meter needs, and it means the proxy
-never has to tokenize anything itself.
+**Decision: Ollama 0.40.6 serving `qwen2.5:0.5b`** (397 MB) on the builder's
+Apple M2 with 16 GB. Installed with Homebrew and run with `ollama serve` only
+when needed, not as a login service.
+
+```bash
+brew install ollama
+ollama serve &                # localhost:11434
+ollama pull qwen2.5:0.5b
+```
+
+| Check | Outcome |
+|---|---|
+| Native `/api/generate` | reports `eval_count`, the tokens produced: 73 for a two-sentence answer |
+| OpenAI-compatible `/v1/chat/completions` | reports `usage.completion_tokens` |
+| Streaming | the final chunk (`done: true`) carries `eval_count` |
+| `max_tokens: 40` | stops at exactly 40, `finish_reason: "length"` |
+| Speed | about 100 tokens per second warm; 4 s for the first call while the model loads |
+
+What this settles for the metered service:
+
+- **The meter needs no tokenizer.** The model reports what it produced, so the
+  proxy reads one number from the response and settles `count × price`.
+- **The cap can be enforced before settlement, not only by it.** The proxy
+  sets `max_tokens` to `floor(cap / price per token)`, so the model cannot
+  produce more than the payer authorized, and settlement below the cap is
+  guaranteed by construction rather than by the contract refusing an
+  overcharge.
+- **The fallback in the risk table is not needed.** The hardware serves a real
+  model, so the demo meters tokens rather than bytes.

@@ -67,11 +67,13 @@ published USDC SAC if it is usable, otherwise deploy a test SAC and say so.
 Stand up the local model the metered demo will proxy, so the meter has
 something real to count without paid credits.
 
-**Partly done 20 October.** Interfaces: mirror the `upto/{client,server,facilitator}`
+**Done 20 October.** Interfaces: mirror the `upto/{client,server,facilitator}`
 triplet that `@x402/evm` and `@x402/svm` already ship, on `@x402/core` v2
 types, which means the spec has to be rebased from v1 first. Token: Circle's
 testnet USDC SAC, usable and settled through. SDK: `^16.3`, matching
-`@x402/stellar`. Local model: still open. Details in
+`@x402/stellar`. Local model: `qwen2.5:0.5b` on Ollama, which reports the
+tokens it produced, so the proxy meters without a tokenizer and can cap output
+with `max_tokens`. Details in
 [`spikes/03-ground-rules`](../spikes/03-ground-rules/README.md).
 
 ## Deliverable 1, registry contract, 28 hours
