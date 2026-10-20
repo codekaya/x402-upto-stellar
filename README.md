@@ -133,6 +133,22 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | D1 **rejected, unregistered token**: failed with `Error(Contract, #1)` `NotRegistered` | [`721cfe96…`](https://stellar.expert/explorer/testnet/tx/721cfe96df6293511780eaed7523c6b4fdfb423c3bb4bff68fed06d288ada8be) |
 | 2026-10-20 | D1 **rejected, wrong network**: failed with `Error(Contract, #2)` `WrongNetwork` | [`a7cce56b…`](https://stellar.expert/explorer/testnet/tx/a7cce56bbe2df01abfe6bfe287fe1f282461a3893da34874b7fe65b5774c1b0d) |
 | 2026-10-20 | D1 **rejected, non-admin write**: failed with `Error(Contract, #3)` `NotAdmin` | [`f2c1ae3b…`](https://stellar.expert/explorer/testnet/tx/f2c1ae3bd009a8f066c671e206f13289c72cb9093e9ad99a1f2cb5b56cedae12) |
+| 2026-10-20 | D2 conformance run 1 (33/34): `settle-below-cap`, 0.2 of 0.5 USDC paid, 0.3 refunded | [`55a5884d…`](https://stellar.expert/explorer/testnet/tx/55a5884db7a7a3169396de2c190255a48531412e2e8e649becf63f0c15053523) |
+| 2026-10-20 | D2 conformance run 1: `settle-zero-burns` | [`e80fb0c1…`](https://stellar.expert/explorer/testnet/tx/e80fb0c19fd8b18872c59f9eaadbc76f7015ae0727c4c7bd17de7141d313819d) |
+| 2026-10-20 | D2 conformance run 1: `settle-same-amount-again` | [`7b6b8862…`](https://stellar.expert/explorer/testnet/tx/7b6b8862bd7e5a419cbd1eff8885c08efab4757826c86d492f8d3f2b8121f625) |
+| 2026-10-20 | D2 conformance run 1: `settle-other-amount-again`, first settlement | [`cb662c2a…`](https://stellar.expert/explorer/testnet/tx/cb662c2a14f07faff1568cd9b57e02d97f0158d19af443b1e2cbe11dfbb2ccd5) |
+| 2026-10-20 | D2 conformance run 1: `settle-replayed-elsewhere`, first settlement | [`08506b28…`](https://stellar.expert/explorer/testnet/tx/08506b28359c396c6d0bd0e0bcd0da79f09b5795bd3b36563ee66f70fe8477c9) |
+| 2026-10-20 | D2 conformance run 2 setup: payer USDC trustline and DEX purchase | [`023d6f0c…`](https://stellar.expert/explorer/testnet/tx/023d6f0c029a603b35578323f831df0961ada1d6ac56dd98771aacc6b8e6115d) |
+| 2026-10-20 | D2 conformance run 2 setup: payee USDC trustline | [`51598706…`](https://stellar.expert/explorer/testnet/tx/515987060eb59606ba3d11313ce7b7c3b1845b79c7751fe86caf578b3c8a4e98) |
+| 2026-10-20 | D2 conformance run 2 (34/34) **settlement with refund**: `settle-below-cap`, 0.2 of 0.5 USDC paid, 0.3 refunded | [`6af2aa56…`](https://stellar.expert/explorer/testnet/tx/6af2aa56a1387c403e9341273d99353e2137e4553e1a1e458bf729c2ed30b6bd) |
+| 2026-10-20 | D2 conformance run 2: `settle-zero-burns`, authorization burned at zero | [`7e0e075c…`](https://stellar.expert/explorer/testnet/tx/7e0e075c2a9ef342c8278bb7210fe36ff3feafb8d89659c3a703f2fec53e6aeb) |
+| 2026-10-20 | D2 conformance run 2: `settle-same-amount-again`, second call returned this same hash | [`f35f9580…`](https://stellar.expert/explorer/testnet/tx/f35f9580dad2440e25baab71dea148aa6cea16af8b13411766823de26911cba4) |
+| 2026-10-20 | D2 conformance run 2: `settle-other-amount-again`, first settlement; the retry was refused | [`d6685860…`](https://stellar.expert/explorer/testnet/tx/d6685860259aebab6a1defc08c3d2ca87a4e8ac46d21179ca991cf976fa09c3c) |
+| 2026-10-20 | D2 conformance run 2: `settle-replayed-elsewhere`, first settlement; the replay was refused | [`3c1afdc2…`](https://stellar.expert/explorer/testnet/tx/3c1afdc21162532ccb103ecca9a171d257e2881c0300ca05d16b51805d57f1f7) |
+
+Not logged: the setup transactions (throwaway accounts' USDC trustlines and DEX
+purchases) of conformance run 1 and of one single-case debugging run, both on
+20 October. They move no funds of this project and settle nothing.
 
 ## Status
 

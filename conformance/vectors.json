@@ -1,0 +1,54 @@
+{
+  "scheme": "upto",
+  "network": "stellar:testnet",
+  "description": "Conformance vectors for the x402 upto scheme on Stellar. Each case starts from a fresh, valid, signed payment for the base requirements, applies one change, and runs verify or settle. A second implementation passes when it returns the same outcome for every case.",
+  "base": {
+    "scheme": "upto",
+    "network": "stellar:testnet",
+    "asset": "CBIELTK6YBZJU5UP2WWQEUCYKLPU6AUNZ2BQ4WWFEIE3USCIHMXQDAMA",
+    "amount": "5000000",
+    "maxTimeoutSeconds": 600
+  },
+  "cases": [
+    { "id": "valid-verifies", "phase": "verify", "expect": { "isValid": true } },
+
+    { "id": "envelope-version-1", "phase": "verify", "change": { "x402Version": 1 }, "expect": { "invalidReason": "invalid_x402_version" } },
+    { "id": "envelope-other-scheme", "phase": "verify", "change": { "requirements": { "scheme": "exact" } }, "expect": { "invalidReason": "unsupported_scheme" } },
+    { "id": "envelope-network-mismatch", "phase": "verify", "change": { "accepted": { "network": "stellar:pubnet" } }, "expect": { "invalidReason": "network_mismatch" } },
+    { "id": "envelope-unsupported-network", "phase": "verify", "change": { "requirements": { "network": "eip155:8453" }, "accepted": { "network": "eip155:8453" } }, "expect": { "invalidReason": "invalid_network" } },
+
+    { "id": "shape-missing-fields", "phase": "verify", "change": { "payload": { "authorization": {}, "signature": "" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_malformed" } },
+    { "id": "shape-signature-not-an-entry", "phase": "verify", "change": { "signature": "bm90IHhkcg==" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_malformed" } },
+    { "id": "accepted-differs", "phase": "verify", "change": { "accepted": { "maxTimeoutSeconds": 601 } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_requirements_mismatch" } },
+    { "id": "contract-not-canonical", "phase": "verify", "change": { "contract": "CAEZC6F4DKZJU5IEOLBQ5XKQWGCNZA6U45KHPKEDKPB35UF3DJCK4WMX" }, "expect": { "invalidReason": "invalid_upto_stellar_contract_not_canonical" } },
+
+    { "id": "payee-redirected", "phase": "verify", "change": { "authorization": { "payee": "$random_account" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_payee" } },
+    { "id": "asset-swapped", "phase": "verify", "change": { "authorization": { "token": "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_asset" } },
+    { "id": "settler-not-this-facilitator", "phase": "verify", "change": { "authorization": { "settler": "$random_account" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_settler" } },
+    { "id": "facilitator-as-payer", "phase": "verify", "change": { "signer": "facilitator" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_facilitator_is_payer" } },
+    { "id": "cap-below-requirements", "phase": "verify", "change": { "authorization": { "maxAmount": "4999999" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_amount" } },
+    { "id": "resource-other-terms", "phase": "verify", "change": { "authorization": { "resource": "0000000000000000000000000000000000000000000000000000000000000000" } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_resource" } },
+    { "id": "window-too-long", "phase": "verify", "change": { "window": { "after": -60, "before": 3600 } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_window_too_long" } },
+    { "id": "window-not-open", "phase": "verify", "change": { "window": { "after": 300, "before": 600 } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_not_yet_valid" } },
+    { "id": "window-closed", "phase": "verify", "change": { "window": { "after": -600, "before": -60 } }, "expect": { "invalidReason": "invalid_upto_stellar_payload_expired" } },
+
+    { "id": "credentials-source-account", "phase": "verify", "change": { "entry": "source_account_credentials" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_unsupported_credential_type" } },
+    { "id": "entry-for-another-address", "phase": "verify", "change": { "entry": "other_address" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_signer" } },
+    { "id": "entry-unsigned", "phase": "verify", "change": { "entry": "unsigned" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_missing_payer_signature" } },
+    { "id": "tree-signs-the-amount", "phase": "verify", "change": { "entry": "tree_with_amount" }, "expect": { "invalidReason": "invalid_upto_stellar_payload_wrong_invocation" } },
+    { "id": "signature-outlives-window", "phase": "verify", "change": { "entry": "expiration_too_far" }, "expect": { "invalidReason": "invalid_upto_stellar_signature_expiration_too_far" } },
+
+    { "id": "payer-without-funds", "phase": "verify", "change": { "signer": "unfunded_payer" }, "expect": { "invalidReason": "invalid_upto_stellar_insufficient_funds" } },
+    { "id": "payee-cannot-receive", "phase": "verify", "change": { "payTo": "payee_without_trustline" }, "expect": { "invalidReason": "invalid_upto_stellar_payee_cannot_receive" } },
+    { "id": "signature-forged", "phase": "verify", "change": { "entry": "forged_signature" }, "expect": { "invalidReason": "invalid_upto_stellar_invalid_signature" } },
+    { "id": "fee-over-ceiling", "phase": "verify", "change": { "facilitator": { "maxTransactionFeeStroops": 1000 } }, "expect": { "invalidReason": "invalid_upto_stellar_fee_exceeds_maximum" } },
+
+    { "id": "settle-below-cap", "phase": "settle", "settle": { "amount": "2000000" }, "expect": { "success": true, "amount": "2000000", "payeeReceives": "2000000", "payerPays": "2000000" } },
+    { "id": "settle-zero-burns", "phase": "settle", "settle": { "amount": "0" }, "expect": { "success": true, "amount": "0", "payeeReceives": "0", "payerPays": "0", "consumed": true } },
+    { "id": "settle-above-cap", "phase": "settle", "settle": { "amount": "5000001" }, "expect": { "success": false, "errorReason": "invalid_upto_stellar_settlement_exceeds_amount" } },
+    { "id": "settle-changed-terms", "phase": "settle", "settle": { "amount": "1000000", "payTo": "$random_account" }, "expect": { "success": false, "errorReason": "invalid_upto_stellar_payload_requirements_mismatch" } },
+    { "id": "settle-same-amount-again", "phase": "settle", "settle": { "amount": "1000000", "then": "same_amount" }, "expect": { "success": true, "sameTransaction": true } },
+    { "id": "settle-other-amount-again", "phase": "settle", "settle": { "amount": "1000000", "then": "other_amount" }, "expect": { "success": false, "errorReason": "invalid_upto_stellar_payload_already_consumed" } },
+    { "id": "settle-replayed-elsewhere", "phase": "settle", "settle": { "amount": "1000000", "then": "fresh_facilitator" }, "expect": { "success": false, "errorReason": "invalid_upto_stellar_payload_already_consumed" } }
+  ]
+}

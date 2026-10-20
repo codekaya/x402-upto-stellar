@@ -19,29 +19,33 @@ const ERROR_TYPES: Record<string, string> = {
 };
 
 /**
- * The first error a contract or the host raised, from diagnostic events, with
- * the contract it came from. Falls back to the error string when no event
- * carries it.
+ * The error a call ended with, attributed to the contract that first raised
+ * it. The outcome is the host's final error: the message when there is one,
+ * else the last error event. Inner events can carry a different error (a
+ * failed ed25519 check surfaces as `Error(Auth, InvalidAction)`), so the
+ * origin is the earliest event carrying the same error as the outcome.
  */
 export function hostErrorOf(events: xdr.DiagnosticEvent[] | undefined, message = ""): HostError | undefined {
+  const raised: HostError[] = [];
   for (const diagnostic of events ?? []) {
     const event = diagnostic.event();
-    const topics = event.body().v0().topics();
-    for (const topic of topics) {
+    for (const topic of event.body().v0().topics()) {
       if (topic.switch().name !== "scvError") continue;
       const error = topic.error();
       const name = error.switch().name;
-      const code = name === "sceContract" ? String(error.contractCode()) : error.code().name.replace(/^scec/, "");
       const contractId = event.contractId();
-      return {
+      raised.push({
         type: ERROR_TYPES[name] ?? name,
-        code,
+        code: name === "sceContract" ? String(error.contractCode()) : error.code().name.replace(/^scec/, ""),
         raisedBy: contractId ? StrKey.encodeContract(Buffer.from(contractId as unknown as Uint8Array)) : undefined,
-      };
+      });
     }
   }
   const match = message.match(/Error\((\w+), #?(\w+)\)/);
-  return match ? { type: match[1], code: match[2] } : undefined;
+  const outcome = match ? { type: match[1], code: match[2] } : raised.at(-1);
+  if (!outcome) return undefined;
+  const origin = raised.find((e) => e.type === outcome.type && e.code === outcome.code);
+  return { type: outcome.type, code: outcome.code, raisedBy: origin?.raisedBy };
 }
 
 export type Read<T> = { ok: true; value: T } | { ok: false; error?: HostError; message: string };
