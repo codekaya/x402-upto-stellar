@@ -117,8 +117,9 @@ with an `upto` entry, serves the request, counts the tokens it actually
 produced, and is settled for that count below the authorized cap, with the
 remainder returning to the payer.
 
-**Recording**: three minutes, the whole cycle, ending on the settlement
-transaction in a block explorer.
+The SOW also lists a three-minute recording of the cycle. The chapter has said
+it is not required, so it is not planned here. If that changes it is an hour of
+work on the last day.
 
 ## The 30 days
 
@@ -129,7 +130,7 @@ transaction in a block explorer.
 | 1 | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
 | 2 | Package scaffold mirroring `exact/*`. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
 | 3 | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
-| 4 | Client, signing paths, npm publish. Metered service and the full cycle. Recording and evidence pack. | npm v0.1.0, metered settlement below the cap, recording |
+| 4 | Client, signing paths, npm publish. Metered service and the full cycle. Evidence pack. | npm v0.1.0, metered settlement below the cap, transaction table complete |
 
 ## Evidence, captured the day it happens
 
@@ -149,7 +150,7 @@ hashes on day 30 is the most avoidable hour of the sprint.
 
 ## Day 30 checklist
 
-The eleven criteria the award is measured against:
+The criteria the award is measured against:
 
 - [ ] Registry deployed, contract ID in the README
 - [ ] A resolution call returns the canonical deployment, visible in an explorer
@@ -161,7 +162,6 @@ The eleven criteria the award is measured against:
 - [ ] The conformance runner reports every case passing against testnet
 - [ ] Client package published at v0.1.0 with types, tests and README
 - [ ] The metered service completes a cycle below the cap, hash published
-- [ ] The three-minute recording shows that cycle end to end
 
 ## Chapter obligations, not billed
 
