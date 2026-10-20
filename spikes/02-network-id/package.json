@@ -1,0 +1,17 @@
+{
+  "name": "spike-02-network-id",
+  "private": true,
+  "type": "module",
+  "description": "Spike 2: the network id a contract sees, and a refusal landed on-chain",
+  "scripts": {
+    "spike": "tsx spike.ts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "17.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

@@ -52,6 +52,15 @@ client gets simpler and the facilitator gains an endpoint.
 record admitted on one network refuses to resolve on another. This is one of
 the three negative cases the award is checked against.
 
+**Done 20 October: it works.** On testnet the contract sees
+`sha256("Test SDF Network ; September 2015")`. Two consequences for the
+registry: `register` takes the network id the record is for, since a record
+stamped with the ledger's own id could never be on the wrong network; and each
+refusal has to be submitted with a borrowed footprint and its decoded error
+written down the same day, because the explorer shows only "Failed" and RPC
+forgets after seven days. Details in
+[`spikes/02-network-id`](../spikes/02-network-id/README.md).
+
 **Spike 3. The ground rules.** Read `exact/client` and `exact/facilitator` and
 write down the interfaces to mirror. Pick the settlement token on testnet: the
 published USDC SAC if it is usable, otherwise deploy a test SAC and say so.

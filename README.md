@@ -67,6 +67,7 @@ specs/
   scheme_upto_stellar.md   the scheme draft intended for upstream
 spikes/
   01-two-signers/          payer signs offline, settler submits: settle_signed on testnet
+  02-network-id/           what network_id() returns on-chain, and a refusal landed with a hash
 ```
 
 ## Getting started
@@ -110,6 +111,9 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | Spike 1 again, contract warm: same split, 0.0029 XLM fee | [`2380de64…`](https://stellar.expert/explorer/testnet/tx/2380de648f78d01b16ca5b98a6623d3cb88c918d48718b3542f7d76ca290e6a1) |
 | 2026-10-20 | Settlement contract instance TTL extended to ledger 8,403,997 (about April 2027) | [`97f17dc2…`](https://stellar.expert/explorer/testnet/tx/97f17dc29f71e265a9ad6a7eb869abdf6ce5f5d05dfd2da4e385afb207696c2c) |
 | 2026-10-20 | Settlement contract wasm TTL extended to ledger 8,404,001 | [`4a07b4b1…`](https://stellar.expert/explorer/testnet/tx/4a07b4b1c3476586886668a6c7c87592f4d72d9550ecde742a040fac2524def3) |
+| 2026-10-20 | Spike 2: network-id probe wasm uploaded | [`492a7684…`](https://stellar.expert/explorer/testnet/tx/492a76846ac352edacb721118323304d84fe88105d86f85e331f7211df3e7094) |
+| 2026-10-20 | Spike 2: probe deployed as `CAEZC6F4DKZJU5IEOLBQ5XKQWGCNZA6U45KHPKEDKPB35UF3DJCK4WMX` | [`078a7a46…`](https://stellar.expert/explorer/testnet/tx/078a7a46ab1e536178f56544867f3be4251ac6b43695e3e8d904d9674bbdc7b3) |
+| 2026-10-20 | Spike 2: refusal landed on-chain, `require_network(pubnet id)` failed with `Error(Contract, #1)` | [`3ef1d4ba…`](https://stellar.expert/explorer/testnet/tx/3ef1d4baaa0d0ed0dc50cc662a444a5a1cd8a630755728baf3f768814d323c0c) |
 
 ## Status
 
