@@ -1,6 +1,6 @@
 # Sprint plan
 
-Instaward sprint, 30 days from 10 November 2026. This plan follows the accepted
+Instaward sprint, 30 days from 20 October to 18 November 2026. This plan follows the accepted
 Statement of Work exactly: three deliverables, 100 hours, eleven success
 criteria checked on day 30.
 
@@ -23,7 +23,7 @@ happens after the sprint.
 ## Before day 1: three spikes
 
 The only real unknowns. A few hours each, and each one changes the plan if it
-fails. They belong before 10 November, not inside the sprint.
+fails. They come before any deliverable code; all three ran on day 1, 20 October.
 
 **Spike 1, the critical one. Two signers in one transaction.** Sign a
 `settle_signed` payload as the payer in TypeScript with `authorizeEntry`,
@@ -160,10 +160,10 @@ work on the last day.
 
 | Week | Work | Output |
 |---|---|---|
-| 1 | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
-| 2 | Package scaffold mirroring `exact/*`. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
-| 3 | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
-| 4 | Client, signing paths, npm publish. Metered service and the full cycle. Evidence pack. | npm v0.1.0, metered settlement below the cap, transaction table complete |
+| 1, 20–26 Oct | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
+| 2, 27 Oct–2 Nov | Package scaffold mirroring `upto/*` on EVM and SVM. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
+| 3, 3–9 Nov | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
+| 4, 10–18 Nov | Client, signing paths, npm publish. Metered service and the full cycle. Evidence pack. | npm v0.1.0, metered settlement below the cap, transaction table complete |
 
 ## Evidence, captured the day it happens
 
@@ -199,7 +199,7 @@ The criteria the award is measured against:
 ## Chapter obligations, not billed
 
 Weekly progress update in the Stellar Türkiye channel. Mid-sprint check-in and
-live demo with the Chapter Lead around day 15. End-of-sprint review against the
+live demo with the Chapter Lead around day 15, 3 November. End-of-sprint review against the
 success criteria, plus a short session on charging for a metered API on
 Stellar.
 
