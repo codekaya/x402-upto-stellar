@@ -9,7 +9,7 @@ endpoint knows its budget, not its bill. The `upto` scheme closes the gap.
 Authorize a ceiling, settle the actual usage, refund the difference. It has EVM
 and SVM specifications; this repository supplies the Stellar one.
 
-- **Spec draft:** [`specs/scheme_upto_stellar.md`](specs/scheme_upto_stellar.md), written for upstream review
+- **Spec draft:** [`specs/scheme_upto_stellar.md`](specs/scheme_upto_stellar.md), x402 v2, written for upstream review
 - **Reference implementation:** [`contracts/upto`](contracts/upto)
 
 ## Why a contract is needed
@@ -31,7 +31,7 @@ Both share one payload type and one id derivation,
 `sha256("x402-upto-stellar-v1" ‖ xdr(contract) ‖ xdr(authorization))`.
 
 **One-shot**, the HTTP flow. The payer signs the payload offline, it travels in
-the `X-PAYMENT` header, and a facilitator submits the only transaction. Escrow
+the `PAYMENT-SIGNATURE` header, and a facilitator submits the only transaction. Escrow
 and payout happen atomically, leaving no contract balance behind.
 
 ```
@@ -121,6 +121,8 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | Spike 3 setup: second payer USDC trustline and purchase | [`73458e38…`](https://stellar.expert/explorer/testnet/tx/73458e3800cd8b210201fdbaecb9eced648c29a04e13426234745c29f8040287) |
 | 2026-10-20 | Spike 3 setup: second payee USDC trustline | [`ff395aed…`](https://stellar.expert/explorer/testnet/tx/ff395aedb6f78fdbef6c2d87a8caf9406bb881ff99bdaf840f9aefd021dc46f0) |
 | 2026-10-20 | Spike 3: `settle_signed` on testnet USDC, warm, 0.003 XLM fee | [`bc2b0093…`](https://stellar.expert/explorer/testnet/tx/bc2b00938a8670cba8b6be61b6da45fe672e08a6f717f6a49792eeb4c76ba3b5) |
+| 2026-10-20 | Spec rebase check: payer USDC setup for the payee-receivability simulations (run aborted on a script error, simulations only) | [`da76022e…`](https://stellar.expert/explorer/testnet/tx/da76022ec7c71f5f53d42f5be717b18bfa852d8b800b53d8bffd7b7fa6fdd192) |
+| 2026-10-20 | Spec rebase check: payer USDC setup; the simulations showed a payee without a trustline passes the zero simulation and fails every positive amount with the token's `TrustlineMissing` | [`17a7ebfc…`](https://stellar.expert/explorer/testnet/tx/17a7ebfc2dfcbcc0ae5de7807f4924b9bdc2c8e50ddeee0bf6723e58769f64cb) |
 
 ## Status
 

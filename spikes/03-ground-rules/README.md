@@ -84,14 +84,14 @@ Deliverable 2 builds on it: `network: "stellar-testnet"` becomes
 `stellar:testnet`, `maxAmountRequired` becomes `amount` (the cap),
 `x402Version: 1` becomes 2, the payload carries `accepted`, the header becomes
 `PAYMENT-SIGNATURE`, the settled amount arrives in `requirements.amount` at
-settle time and leaves in `SettleResponse.amount`.
+settle time and leaves in `SettleResponse.amount`. Done the same day: see the
+spec's "Changes from the x402 v1 draft".
 
-**One decision for week 3: what settling zero means.** EVM skips the chain.
+**Decided 20 October: settling zero burns the authorization.** EVM skips the chain.
 On Stellar, skipping leaves the payer's entry valid until its window closes, so
 a settler could still settle up to the cap later. Calling
 `settle_signed(…, 0)` costs about 0.003 XLM and burns the authorization for
-good. The facilitator should pick one, and the conformance vectors should pin
-it.
+good. The spec now submits it, and the conformance vectors pin it.
 
 **The fee ceiling fits.** A warm `settle_signed` costs 29,016 to 30,516
 stroops, under `exact`'s 50,000 default. A cold one, where the instance or a

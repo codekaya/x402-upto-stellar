@@ -7,5 +7,5 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "files": ["spike.ts"]
+  "files": ["spike.ts", "receivability.ts"]
 }

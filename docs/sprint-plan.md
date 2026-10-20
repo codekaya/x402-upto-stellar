@@ -102,31 +102,38 @@ and a measured resource profile for registration and resolution.
 ## Deliverable 2, facilitator and conformance suite, 40 hours
 
 **Verification**, in the spec's cheapest-first order, each failure returning its
-specified reason:
+specified reason (the spec's verify table, rebased on x402 v2 on 20 October):
 
-scheme and network, payload contract against the advertised contract, payee and
-token, cap against the advertised minimum, resource match, validity window,
-signature shape, replay state through `is_consumed`, payer balance, and finally
-a simulated `settle_signed` at zero, which checks authorization and solvency
-without committing to a price.
+envelope (version, scheme, network), payload shape, `accepted` against the
+requirements, the registry check, payee, asset, settler and amount against the
+requirements, resource commitment, validity window, credential type, signer and
+invocation tree, signature expiry, replay state through `is_consumed`, payer
+balance, payee able to receive the asset, and finally a simulated
+`settle_signed` at zero, which checks authorization and solvency without
+committing to a price, under a fee ceiling.
 
 **The registry check**: a payload naming a contract address that does not
-resolve through Deliverable 1 is refused before anything else happens.
+resolve through Deliverable 1 is refused before any state-dependent check runs.
 
-**Settlement**: submit, return the transaction hash, map every contract error to
-its x402 reason:
+**Settlement**: submit, return the transaction hash and the settled amount, map
+every error to its x402 reason, attributing each contract error to the contract
+that raised it, since the escrow and the token share one code space:
 
-| Contract error | Reason |
+| Error | Reason |
 |---|---|
-| `AlreadyConsumed` | `invalid_payment` |
-| `Expired`, `NotYetValid` | `invalid_timing` |
-| `AmountOutOfRange` | `invalid_amount` |
-| `InvalidMaxAmount`, `InvalidValidityWindow`, `ValidityWindowTooLong`, `PayerIsPayee` | `invalid_payment_requirements` |
-| host authorization failure | `invalid_signature` |
-| token transfer failure | `insufficient_funds` |
+| escrow `InvalidMaxAmount`, `InvalidValidityWindow`, `PayerIsPayee` | `invalid_upto_stellar_payload_malformed` |
+| escrow `ValidityWindowTooLong` | `invalid_upto_stellar_payload_window_too_long` |
+| escrow `NotYetValid`, `Expired` | `invalid_upto_stellar_payload_not_yet_valid`, `invalid_upto_stellar_payload_expired` |
+| escrow `AlreadyConsumed`, host `Error(Auth, ExistingValue)` | `invalid_upto_stellar_payload_already_consumed` |
+| escrow `AmountOutOfRange` | `invalid_upto_stellar_settlement_exceeds_amount` |
+| any other host authorization failure | `invalid_upto_stellar_invalid_signature` |
+| token error on the transfer to the payee | `invalid_upto_stellar_payee_cannot_receive` |
+| token error on a transfer from the payer | `invalid_upto_stellar_insufficient_funds` |
+| submission rejected, or landed failed otherwise | `settle_upto_stellar_transaction_submission_failed`, `settle_upto_stellar_transaction_failed` |
 
 A failed settlement is never retried with a different amount: the first
-successful call consumes the id permanently.
+successful call consumes the id permanently. A settlement of zero is still
+submitted, which burns the authorization.
 
 **Conformance vectors**: a published suite of valid and invalid payloads with
 their expected outcomes, and a runner that executes them against a given
@@ -135,7 +142,7 @@ deployment and prints one line per case.
 ## Deliverable 3, client package and metered service, 32 hours
 
 **Client**: payload construction, authorization-entry signing, id derivation
-through the contract view, registry lookup, `X-PAYMENT` encoding. Published to
+through the contract view, registry lookup, `PAYMENT-SIGNATURE` encoding. Published to
 npm at v0.1.0 with types, tests and a README.
 
 **Metered service**: a proxy in front of a locally hosted model that answers 402

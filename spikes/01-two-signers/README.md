@@ -100,6 +100,25 @@ were extended the same day to testnet's maximum, ledger 8,404,001, about April
 needs the same instance policy, and the facilitator should report archived
 entries rather than quietly paying for them.
 
+## Follow-up: a payee that cannot receive
+
+Run while rebasing the spec, with [`receivability.ts`](receivability.ts)
+(`npm run receivability`). The payee has no USDC trustline; everything after
+the payer's setup is simulated.
+
+| Simulation | Outcome |
+|---|---|
+| `settle_signed(…, 0)` | succeeds |
+| `settle_signed(…, 1)` and `(…, 2 USDC)` | `Error(Contract, #13)`, raised by the USDC SAC and propagated through upto |
+| `USDC.balance(payee)` | `Error(Contract, #13)` |
+
+So the zero simulation that ends verification cannot see a payee unable to
+receive, because a zero settlement never pays the payee. The spec adds a
+`balance(payTo)` check before it. And because #13 is the token's
+`TrustlineMissing` surfacing through the escrow contract, error codes have to
+be attributed to the contract that raised them: the token's codes overlap the
+escrow's.
+
 ## Warm resource profile
 
 One `settle_signed` with a refund, five token movements in all:

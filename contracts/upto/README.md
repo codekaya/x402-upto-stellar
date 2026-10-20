@@ -30,7 +30,7 @@ replay protection, on top of any SEP-41 token.
 Both share one payload type and one id derivation.
 
 **One-shot** — the HTTP flow. The payer signs the payload offline, it travels in
-the `X-PAYMENT` header, and a facilitator submits the only transaction. Escrow
+the `PAYMENT-SIGNATURE` header, and a facilitator submits the only transaction. Escrow
 and payout happen atomically, leaving no contract balance behind.
 
 ```
