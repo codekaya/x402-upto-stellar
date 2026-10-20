@@ -156,8 +156,6 @@ base64-encoded `PaymentPayload`:
 }
 ```
 
-`resource` is required for `upto`, because the payload commits to it.
-
 ### `authorization`
 
 Field names map one-to-one onto the contract's `UptoAuthorization` type, and
@@ -182,14 +180,20 @@ close time. `nonce` and `resource` are 32-byte hex without a `0x` prefix.
 ### Resource commitment
 
 ```
-resource = sha256( JCS({ "accepted": accepted, "url": resource.url }) )
+resource = sha256( JCS(accepted) )
 ```
 
 `JCS` is the JSON Canonicalization Scheme, RFC 8785. The commitment covers the
-requirements as the client accepted them, with `amount` still the cap, and the
-URL being paid for. The contract does not interpret it; it guarantees payer and
-settler agreed on the same value, which is what lets a dispute be resolved
-against the advertised terms.
+requirements as the client accepted them, with `amount` still the cap. The
+contract does not interpret it; it guarantees payer and settler agreed on the
+same value, which is what lets a dispute be resolved against the advertised
+terms.
+
+The URL is deliberately not part of it: in `@x402/core` a scheme client
+receives the selected requirements and nothing else, so a commitment that
+needed `resource.url` could not be computed by a scheme plugged into the
+standard client. A server that wants the URL bound can carry it in `extra`,
+which the commitment then covers.
 
 ### `signature`
 
@@ -533,7 +537,7 @@ answered by the registry rather than by a Bazaar entry.
   `payload.contract` is dropped in favour of `accepted.extra.contract`.
 - `extra.settler` → `extra.facilitatorAddress`; `extra.decimals` dropped;
   `extra.areFeesSponsored` added.
-- Resource commitment defined over `accepted` and the URL with RFC 8785.
+- Resource commitment defined as the RFC 8785 digest of `accepted`.
 - Reasons follow the v2 convention: generic for the envelope, otherwise
   prefixed `invalid_upto_stellar_` or `settle_upto_stellar_`.
 - Verification gains the registry check, settler and payee-receivability checks,

@@ -9,7 +9,14 @@
     "url": "git+https://github.com/codekaya/x402-upto-stellar.git",
     "directory": "packages/x402-upto-stellar"
   },
-  "keywords": ["x402", "stellar", "soroban", "upto", "payments", "metered"],
+  "keywords": [
+    "x402",
+    "stellar",
+    "soroban",
+    "upto",
+    "payments",
+    "metered"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -28,7 +35,11 @@
       "default": "./dist/upto/facilitator/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -47,5 +58,9 @@
     "@types/node": "^24.0.0",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0"
+  },
+  "homepage": "https://github.com/codekaya/x402-upto-stellar/tree/main/packages/x402-upto-stellar",
+  "bugs": {
+    "url": "https://github.com/codekaya/x402-upto-stellar/issues"
   }
 }

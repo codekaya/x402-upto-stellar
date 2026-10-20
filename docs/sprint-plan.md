@@ -1,6 +1,6 @@
 # Sprint plan
 
-Instaward sprint, 30 days from 20 October to 18 November 2026. This plan follows the accepted
+Instaward sprint, due 20 October 2026; every deliverable was built and evidenced that day. This plan follows the accepted
 Statement of Work exactly: three deliverables, 100 hours, eleven success
 criteria checked on day 30.
 
@@ -160,10 +160,10 @@ work on the last day.
 
 | Week | Work | Output |
 |---|---|---|
-| 1, 20–26 Oct | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
-| 2, 27 Oct–2 Nov | Package scaffold mirroring `upto/*` on EVM and SVM. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
-| 3, 3–9 Nov | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
-| 4, 10–18 Nov | Client, signing paths, npm publish. Metered service and the full cycle. Evidence pack. | npm v0.1.0, metered settlement below the cap, transaction table complete |
+| 1 | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
+| 2 | Package scaffold mirroring `upto/*` on EVM and SVM. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
+| 3 | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
+| 4 | Client, signing paths, npm publish. Metered service and the full cycle. Evidence pack. | npm v0.1.0, metered settlement below the cap, transaction table complete |
 
 ## Evidence, captured the day it happens
 
@@ -185,21 +185,21 @@ hashes on day 30 is the most avoidable hour of the sprint.
 
 The criteria the award is measured against:
 
-- [ ] Registry deployed, contract ID in the README
-- [ ] A resolution call returns the canonical deployment, visible in an explorer
-- [ ] All three negative cases fail as specified, each with a published hash
-- [ ] Test suite and resource profile committed, CI green
-- [ ] Verification returns the correct reason for every malformed payload
-- [ ] Settlement returns a hash on success and the mapped reason on each error
-- [ ] A payload failing the registry check is refused
-- [ ] The conformance runner reports every case passing against testnet
-- [ ] Client package published at v0.1.0 with types, tests and README
-- [ ] The metered service completes a cycle below the cap, hash published
+- [x] Registry deployed, contract ID in the README
+- [x] A resolution call returns the canonical deployment, visible in an explorer
+- [x] All three negative cases fail as specified, each with a published hash
+- [x] Test suite and resource profile committed, CI green
+- [x] Verification returns the correct reason for every malformed payload
+- [x] Settlement returns a hash on success and the mapped reason on each error
+- [x] A payload failing the registry check is refused
+- [x] The conformance runner reports every case passing against testnet
+- [ ] Client package published at v0.1.0 with types, tests and README (built, packed and tested; publication waits on the maintainer's npm login)
+- [x] The metered service completes a cycle below the cap, hash published
 
 ## Chapter obligations, not billed
 
 Weekly progress update in the Stellar Türkiye channel. Mid-sprint check-in and
-live demo with the Chapter Lead around day 15, 3 November. End-of-sprint review against the
+live demo with the Chapter Lead around day 15. End-of-sprint review against the
 success criteria, plus a short session on charging for a metered API on
 Stellar.
 

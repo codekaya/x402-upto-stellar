@@ -9,8 +9,47 @@ endpoint knows its budget, not its bill. The `upto` scheme closes the gap.
 Authorize a ceiling, settle the actual usage, refund the difference. It has EVM
 and SVM specifications; this repository supplies the Stellar one.
 
-- **Spec draft:** [`specs/scheme_upto_stellar.md`](specs/scheme_upto_stellar.md), x402 v2, written for upstream review
-- **Reference implementation:** [`contracts/upto`](contracts/upto)
+Built under a Stellar Türkiye Instaward. Testnet only, not audited.
+
+| Piece | Where |
+|---|---|
+| Settlement contract (dependency, live before the sprint) | [`contracts/upto`](contracts/upto) |
+| **D1** Discovery registry contract | [`contracts/registry`](contracts/registry) |
+| **D2** Facilitator: verify and settle | [`packages/x402-upto-stellar/src/upto/facilitator`](packages/x402-upto-stellar/src/upto/facilitator) |
+| **D2** Conformance vectors and runner | [`conformance`](conformance) |
+| **D3** Client and server, npm package `x402-upto-stellar` | [`packages/x402-upto-stellar`](packages/x402-upto-stellar) |
+| **D3** Metered inference service and paying agent | [`examples/metered-service`](examples/metered-service) |
+| Scheme specification, x402 v2 | [`specs/scheme_upto_stellar.md`](specs/scheme_upto_stellar.md) |
+
+## Evidence
+
+| What | Tx |
+|---|---|
+| Registry registration: USDC → upto, for testnet | [`f580528c…`](https://stellar.expert/explorer/testnet/tx/f580528c3a602e4a7511bcfe35fc516dd72e81726a28e76d91f823514272fdd0) |
+| Registry resolution: `resolve(USDC)` returns the upto deployment | [`3d9be975…`](https://stellar.expert/explorer/testnet/tx/3d9be975a26ec1b088c35dadf71d4909bf7d5ca0a890d143128f3109ca446972) |
+| Rejected, unregistered token: `Error(Contract, #1)` `NotRegistered` | [`721cfe96…`](https://stellar.expert/explorer/testnet/tx/721cfe96df6293511780eaed7523c6b4fdfb423c3bb4bff68fed06d288ada8be) |
+| Rejected, wrong network: `Error(Contract, #2)` `WrongNetwork` | [`a7cce56b…`](https://stellar.expert/explorer/testnet/tx/a7cce56bbe2df01abfe6bfe287fe1f282461a3893da34874b7fe65b5774c1b0d) |
+| Rejected, non-admin write: `Error(Contract, #3)` `NotAdmin` | [`f2c1ae3b…`](https://stellar.expert/explorer/testnet/tx/f2c1ae3bd009a8f066c671e206f13289c72cb9093e9ad99a1f2cb5b56cedae12) |
+| Verification simulation: `settle_signed` at zero, in enforcing mode | a simulation, so no transaction: case `valid-verifies` in [`conformance/RESULTS.md`](conformance/RESULTS.md) |
+| Settlement with refund: 0.2 of a 0.5 USDC cap paid, 0.3 refunded | [`6af2aa56…`](https://stellar.expert/explorer/testnet/tx/6af2aa56a1387c403e9341273d99353e2137e4553e1a1e458bf729c2ed30b6bd) |
+| Metered settlement below the cap: 35 tokens, 0.0035 of a 0.05 USDC cap, 0.0465 returned | [`1630e707…`](https://stellar.expert/explorer/testnet/tx/1630e707676f99119fa516ae7a7112d266528eafaebb7f7efa5fba7b4dbb2128) |
+
+Every other transaction is in the [on-chain record](#on-chain-record).
+
+## Success criteria
+
+| Criterion | Status |
+|---|---|
+| Registry deployed, contract ID in the README | done: [`CAC3XLU6…DVF46`](#deployments) |
+| A resolution call returns the canonical deployment, visible in an explorer | done: [evidence](#evidence) |
+| All three negative cases fail as specified, each with a published hash | done: [evidence](#evidence), codes decoded the same day in [`contracts/registry`](contracts/registry#evidence) |
+| Test suite and resource profile committed, CI green | done: 13 registry tests, [resource profile](contracts/registry#resource-profile) |
+| Verification returns the correct reason for every malformed payload | done: 27 verify cases in [`conformance/RESULTS.md`](conformance/RESULTS.md) |
+| Settlement returns a hash on success and the mapped reason on each error | done: 7 settle cases, same file |
+| A payload failing the registry check is refused | done: case `contract-not-canonical` |
+| The conformance runner reports every case passing against testnet | done: 34 / 34 |
+| Client package published at v0.1.0 with types, tests and README | built and packed, 45 tests; npm publication pending the maintainer's npm login |
+| The metered service completes a cycle below the cap, hash published | done: [evidence](#evidence) |
 
 ## Why a contract is needed
 
@@ -56,41 +95,40 @@ so the payer never depends on a cooperative counterparty.
 ## Layout
 
 ```
-contracts/upto/src/
-  lib.rs       contract entry points and payload validation
-  types.rs     UptoAuthorization, Lock, Settlement
-  error.rs     contract error codes
-  storage.rs   replay markers (temporary) and escrows (persistent), with TTLs
-  events.rs    Locked / Settled / Reclaimed
-  test.rs      27 tests: settlement paths, validation, authorization binding
-contracts/registry/        discovery registry: canonical deployment per token, network-checked
-specs/
-  scheme_upto_stellar.md   the scheme draft intended for upstream
-spikes/
-  01-two-signers/          payer signs offline, settler submits: settle_signed on testnet
-  02-network-id/           what network_id() returns on-chain, and a refusal landed with a hash
-  03-ground-rules/         the exact/* and upto/* interfaces to mirror, the token, the local model
+contracts/upto/          settlement contract: settle_signed, lock / settle / reclaim (27 tests)
+contracts/registry/      discovery registry: canonical deployment per token, network-checked (13 tests)
+packages/x402-upto-stellar/
+  src/upto/client/       SchemeNetworkClient: builds and signs the payment
+  src/upto/server/       SchemeNetworkServer: prices and requirements
+  src/upto/facilitator/  SchemeNetworkFacilitator: 26-step verify, settle
+  src/shared/            encoding, chain reads, reasons and error attribution
+  test/                  45 offline tests
+conformance/             vectors.json, run.ts, RESULTS.md
+examples/metered-service/ server.ts (402 proxy in front of Ollama), agent.ts (pays it)
+scripts/                 registry-evidence.ts: lands the three refusals, measures resources
+specs/                   the scheme specification
+spikes/                  the three pre-build spikes and their findings
 ```
 
 ## Getting started
 
-Requires Rust 1.85+ and the `wasm32v1-none` target. The Stellar CLI is only
-needed for deployment, and `optimize` and `deploy` need stellar-cli 23 or newer.
+Contracts need Rust 1.85+ and the `wasm32v1-none` target; the TypeScript side
+needs Node 20+.
 
 ```bash
-rustup target add wasm32v1-none
-make test      # contract tests in the Soroban host emulator, no network needed
-make build     # release wasm
-make check     # fmt + clippy -D warnings + tests
+make check                 # contracts: fmt, clippy -D warnings, tests
+npm install && npm test    # package: 45 offline tests
+npx tsx conformance/run.ts # 34 conformance cases against testnet, writes RESULTS.md
 ```
 
-Deploying to testnet. The contract takes no constructor arguments and has no
-admin: it is permissionless infrastructure, so one deployment per network is
-enough.
+The metered demo needs a local model:
 
 ```bash
-stellar keys generate --global deployer --network testnet --fund
-make deploy NETWORK=testnet SOURCE=deployer
+brew install ollama && ollama serve &
+ollama pull qwen2.5:0.5b
+npm run build
+npx tsx examples/metered-service/server.ts   # terminal 1
+npx tsx examples/metered-service/agent.ts    # terminal 2
 ```
 
 ## Deployments
@@ -145,6 +183,9 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | D2 conformance run 2: `settle-same-amount-again`, second call returned this same hash | [`f35f9580…`](https://stellar.expert/explorer/testnet/tx/f35f9580dad2440e25baab71dea148aa6cea16af8b13411766823de26911cba4) |
 | 2026-10-20 | D2 conformance run 2: `settle-other-amount-again`, first settlement; the retry was refused | [`d6685860…`](https://stellar.expert/explorer/testnet/tx/d6685860259aebab6a1defc08c3d2ca87a4e8ac46d21179ca991cf976fa09c3c) |
 | 2026-10-20 | D2 conformance run 2: `settle-replayed-elsewhere`, first settlement; the replay was refused | [`3c1afdc2…`](https://stellar.expert/explorer/testnet/tx/3c1afdc21162532ccb103ecca9a171d257e2881c0300ca05d16b51805d57f1f7) |
+| 2026-10-20 | D3 setup: metered service payee USDC trustline | [`a56e0932…`](https://stellar.expert/explorer/testnet/tx/a56e09325370c2fd1af0a85777d748f9af427c7e2b32f70ef906c458d95abd41) |
+| 2026-10-20 | D3 setup: agent payer USDC trustline and DEX purchase | [`7551be20…`](https://stellar.expert/explorer/testnet/tx/7551be208417de26646b452c5dbfc9f33f8bbf2533f7040d401a151c33171a8c) |
+| 2026-10-20 | D3 **metered settlement below the cap**: 35 tokens of qwen2.5:0.5b, 0.0035 of a 0.05 USDC cap, 0.0465 returned | [`1630e707…`](https://stellar.expert/explorer/testnet/tx/1630e707676f99119fa516ae7a7112d266528eafaebb7f7efa5fba7b4dbb2128) |
 
 Not logged: the setup transactions (throwaway accounts' USDC trustlines and DEX
 purchases) of conformance run 1 and of one single-case debugging run, both on
@@ -152,16 +193,9 @@ purchases) of conformance run 1 and of one single-case debugging run, both on
 
 ## Status
 
-The settlement contract and its test suite are complete and green, and the
-scheme draft is written for upstream review with its open questions listed at
-the end of that document.
-
-What is missing is everything around it. Nothing can discover which deployment
-is canonical for a network, no facilitator implements verification or
-settlement, no client builds and signs a payment, and there are no conformance
-vectors for a second implementation to check itself against. That work is next.
-
-Not audited. Testnet only.
+All three deliverables are built and evidenced on testnet. The settlement
+contract predates them and is a dependency. Open questions for the x402 TSC
+are listed at the end of the specification. Not audited. Testnet only.
 
 ## License
 
