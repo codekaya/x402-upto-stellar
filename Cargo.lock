@@ -2073,6 +2073,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "x402-upto-registry"
+version = "0.1.0"
+dependencies = [
+ "soroban-sdk",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.62"
 source = "registry+https://github.com/rust-lang/crates.io-index"

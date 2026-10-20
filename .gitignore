@@ -5,3 +5,4 @@ target/
 node_modules/
 # SOW versions: personal contact details, kept local
 docs/instaward/
+dist/

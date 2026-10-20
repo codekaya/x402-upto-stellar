@@ -1,0 +1,13 @@
+{
+  "name": "x402-upto-stellar-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w x402-upto-stellar",
+    "test": "npm test -w x402-upto-stellar",
+    "typecheck": "npm run typecheck -w x402-upto-stellar"
+  }
+}

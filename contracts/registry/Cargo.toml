@@ -1,0 +1,18 @@
+[package]
+name = "x402-upto-registry"
+description = "Discovery registry for the x402 `upto` scheme on Stellar: the canonical deployment per network and token"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["lib", "cdylib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

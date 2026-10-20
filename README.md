@@ -63,6 +63,7 @@ contracts/upto/src/
   storage.rs   replay markers (temporary) and escrows (persistent), with TTLs
   events.rs    Locked / Settled / Reclaimed
   test.rs      27 tests: settlement paths, validation, authorization binding
+contracts/registry/        discovery registry: canonical deployment per token, network-checked
 specs/
   scheme_upto_stellar.md   the scheme draft intended for upstream
 spikes/
@@ -94,9 +95,10 @@ make deploy NETWORK=testnet SOURCE=deployer
 
 ## Deployments
 
-| Network | Contract | Deployed |
-|---|---|---|
-| Testnet | [`CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB`](https://stellar.expert/explorer/testnet/contract/CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB) | [tx](https://stellar.expert/explorer/testnet/tx/c838a72ac74fad5735f1807ad0ee1761143f6faad0fb76f29ec9d3eaa2920a5e) |
+| Contract | Network | Address | Deployed |
+|---|---|---|---|
+| Settlement (`upto`) | Testnet | [`CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB`](https://stellar.expert/explorer/testnet/contract/CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB) | [tx](https://stellar.expert/explorer/testnet/tx/c838a72ac74fad5735f1807ad0ee1761143f6faad0fb76f29ec9d3eaa2920a5e) |
+| Registry | Testnet | [`CAC3XLU6CVQWFWUHABQYMZRIQJIZJLWGCNFVVACJB2YZ3DTWO2KDVF46`](https://stellar.expert/explorer/testnet/contract/CAC3XLU6CVQWFWUHABQYMZRIQJIZJLWGCNFVVACJB2YZ3DTWO2KDVF46) | [tx](https://stellar.expert/explorer/testnet/tx/486a485e177f44dd532cfa9798ef7756d131f9bcb81f2d2300e2e1e30333dd1a) |
 
 Read the live interface with
 `stellar contract info interface --id CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB --network testnet`.
@@ -123,6 +125,14 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | Spike 3: `settle_signed` on testnet USDC, warm, 0.003 XLM fee | [`bc2b0093…`](https://stellar.expert/explorer/testnet/tx/bc2b00938a8670cba8b6be61b6da45fe672e08a6f717f6a49792eeb4c76ba3b5) |
 | 2026-10-20 | Spec rebase check: payer USDC setup for the payee-receivability simulations (run aborted on a script error, simulations only) | [`da76022e…`](https://stellar.expert/explorer/testnet/tx/da76022ec7c71f5f53d42f5be717b18bfa852d8b800b53d8bffd7b7fa6fdd192) |
 | 2026-10-20 | Spec rebase check: payer USDC setup; the simulations showed a payee without a trustline passes the zero simulation and fails every positive amount with the token's `TrustlineMissing` | [`17a7ebfc…`](https://stellar.expert/explorer/testnet/tx/17a7ebfc2dfcbcc0ae5de7807f4924b9bdc2c8e50ddeee0bf6723e58769f64cb) |
+| 2026-10-20 | D1: registry wasm uploaded | [`52423b31…`](https://stellar.expert/explorer/testnet/tx/52423b31752c2c879d763af90f03f16501848c5672c5c50f933cf9954d5df2e2) |
+| 2026-10-20 | D1: registry deployed as `CAC3XLU6CVQWFWUHABQYMZRIQJIZJLWGCNFVVACJB2YZ3DTWO2KDVF46` | [`486a485e…`](https://stellar.expert/explorer/testnet/tx/486a485e177f44dd532cfa9798ef7756d131f9bcb81f2d2300e2e1e30333dd1a) |
+| 2026-10-20 | D1 **registration**: USDC → upto, for testnet | [`f580528c…`](https://stellar.expert/explorer/testnet/tx/f580528c3a602e4a7511bcfe35fc516dd72e81726a28e76d91f823514272fdd0) |
+| 2026-10-20 | D1 **resolution**: `resolve(USDC)` returned `CCDHT7LJ…VVXQB` | [`3d9be975…`](https://stellar.expert/explorer/testnet/tx/3d9be975a26ec1b088c35dadf71d4909bf7d5ca0a890d143128f3109ca446972) |
+| 2026-10-20 | D1 setup: XLM registered under the pubnet id | [`29c2a441…`](https://stellar.expert/explorer/testnet/tx/29c2a441556cac5f8db8e47101dea33873e52f3d4889618996345ffcea22947a) |
+| 2026-10-20 | D1 **rejected, unregistered token**: failed with `Error(Contract, #1)` `NotRegistered` | [`721cfe96…`](https://stellar.expert/explorer/testnet/tx/721cfe96df6293511780eaed7523c6b4fdfb423c3bb4bff68fed06d288ada8be) |
+| 2026-10-20 | D1 **rejected, wrong network**: failed with `Error(Contract, #2)` `WrongNetwork` | [`a7cce56b…`](https://stellar.expert/explorer/testnet/tx/a7cce56bbe2df01abfe6bfe287fe1f282461a3893da34874b7fe65b5774c1b0d) |
+| 2026-10-20 | D1 **rejected, non-admin write**: failed with `Error(Contract, #3)` `NotAdmin` | [`f2c1ae3b…`](https://stellar.expert/explorer/testnet/tx/f2c1ae3bd009a8f066c671e206f13289c72cb9093e9ad99a1f2cb5b56cedae12) |
 
 ## Status
 
