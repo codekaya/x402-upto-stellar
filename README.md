@@ -65,6 +65,8 @@ contracts/upto/src/
   test.rs      27 tests: settlement paths, validation, authorization binding
 specs/
   scheme_upto_stellar.md   the scheme draft intended for upstream
+spikes/
+  01-two-signers/          payer signs offline, settler submits: settle_signed on testnet
 ```
 
 ## Getting started
@@ -96,6 +98,18 @@ make deploy NETWORK=testnet SOURCE=deployer
 
 Read the live interface with
 `stellar contract info interface --id CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB --network testnet`.
+
+## On-chain record
+
+Every testnet transaction this project produces, appended the day it lands.
+
+| Date | What | Tx |
+|---|---|---|
+| 2026-10-09 | Settlement contract deployed | [`c838a72a…`](https://stellar.expert/explorer/testnet/tx/c838a72ac74fad5735f1807ad0ee1761143f6faad0fb76f29ec9d3eaa2920a5e) |
+| 2026-10-20 | Spike 1: `settle_signed`, payer signed offline, settler submitted; 2 of 5 XLM paid, 3 refunded. Also restored the archived instance and wasm | [`a8917bfe…`](https://stellar.expert/explorer/testnet/tx/a8917bfeb6b77cef1b028c56ebef743ac39193d5bfa7bdbfaeec8e7d189d2399) |
+| 2026-10-20 | Spike 1 again, contract warm: same split, 0.0029 XLM fee | [`2380de64…`](https://stellar.expert/explorer/testnet/tx/2380de648f78d01b16ca5b98a6623d3cb88c918d48718b3542f7d76ca290e6a1) |
+| 2026-10-20 | Settlement contract instance TTL extended to ledger 8,403,997 (about April 2027) | [`97f17dc2…`](https://stellar.expert/explorer/testnet/tx/97f17dc29f71e265a9ad6a7eb869abdf6ce5f5d05dfd2da4e385afb207696c2c) |
+| 2026-10-20 | Settlement contract wasm TTL extended to ledger 8,404,001 | [`4a07b4b1…`](https://stellar.expert/explorer/testnet/tx/4a07b4b1c3476586886668a6c7c87592f4d72d9550ecde742a040fac2524def3) |
 
 ## Status
 

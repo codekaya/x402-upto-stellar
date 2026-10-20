@@ -1,0 +1,17 @@
+{
+  "name": "spike-01-two-signers",
+  "private": true,
+  "type": "module",
+  "description": "Spike 1: payer signs settle_signed offline with authorizeEntry, settler submits",
+  "scripts": {
+    "spike": "tsx spike.ts"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "17.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

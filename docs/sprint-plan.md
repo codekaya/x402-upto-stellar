@@ -34,6 +34,14 @@ payer's authorization entry and the settler's own signature.
 Target: one settlement on testnet where the payee is paid, the remainder
 returns to the payer, and neither signer could have changed the other's half.
 
+**Done 20 October: it works.** One settlement on testnet, payee paid, remainder
+refunded, both tamper directions refused. Three findings feed the sprint: an
+exact replay surfaces as `Error(Auth, ExistingValue)` rather than
+`AlreadyConsumed`, the facilitator must accept both v1 and CAP-71 v2 address
+credentials, and the settlement contract's instance and wasm had been archived, now
+extended to about April 2027. Details in
+[`spikes/01-two-signers`](../spikes/01-two-signers/README.md).
+
 If it fails, the one-shot HTTP path is unreachable from a browser or an agent
 and the sprint pivots to the session path: the payer submits `lock` themselves
 and the facilitator only calls `settle`. All three deliverables survive; the
