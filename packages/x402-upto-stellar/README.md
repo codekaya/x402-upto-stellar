@@ -1,4 +1,4 @@
-# x402-upto-stellar
+# @codekaya/x402-upto-stellar
 
 The x402 `upto` payment scheme for Stellar: pay for a metered service with an
 enforced spending cap. The client authorizes a ceiling, the server settles what
@@ -10,16 +10,16 @@ Three entry points, mirroring `upto` in `@x402/evm` and `@x402/svm` and built on
 
 | Import | Implements | Role |
 |---|---|---|
-| `x402-upto-stellar/upto/client` | `SchemeNetworkClient` | builds the authorization and signs the payer's Soroban auth entry |
-| `x402-upto-stellar/upto/server` | `SchemeNetworkServer` | prices in USDC, adds the escrow contract and facilitator address to the requirements |
-| `x402-upto-stellar/upto/facilitator` | `SchemeNetworkFacilitator` | verifies in 26 cheapest-first checks, settles as the transaction source |
+| `@codekaya/x402-upto-stellar/upto/client` | `SchemeNetworkClient` | builds the authorization and signs the payer's Soroban auth entry |
+| `@codekaya/x402-upto-stellar/upto/server` | `SchemeNetworkServer` | prices in USDC, adds the escrow contract and facilitator address to the requirements |
+| `@codekaya/x402-upto-stellar/upto/facilitator` | `SchemeNetworkFacilitator` | verifies in 26 cheapest-first checks, settles as the transaction source |
 
 **Testnet only. Not audited.**
 
 ## Install
 
 ```bash
-npm install x402-upto-stellar @x402/core @x402/stellar
+npm install @codekaya/x402-upto-stellar @x402/core @x402/stellar
 ```
 
 ## Client
@@ -31,7 +31,7 @@ same `ClientStellarSigner` as `exact`.
 import { x402Client } from "@x402/core/client";
 import { decodePaymentRequiredHeader, encodePaymentSignatureHeader } from "@x402/core/http";
 import { createEd25519Signer } from "@x402/stellar";
-import { UptoStellarScheme } from "x402-upto-stellar/upto/client";
+import { UptoStellarScheme } from "@codekaya/x402-upto-stellar/upto/client";
 
 const client = new x402Client().register("stellar:*", new UptoStellarScheme(createEd25519Signer(secret, "stellar:testnet")));
 
@@ -47,7 +47,7 @@ against the on-chain registry and refuses any other escrow address.
 ## Server
 
 ```ts
-import { UptoStellarScheme as UptoServer } from "x402-upto-stellar/upto/server";
+import { UptoStellarScheme as UptoServer } from "@codekaya/x402-upto-stellar/upto/server";
 
 const scheme = new UptoServer();
 const { asset, amount } = await scheme.parsePrice("$0.05", "stellar:testnet"); // the cap
@@ -65,7 +65,7 @@ metered amount, never more than the cap.
 
 ```ts
 import { createEd25519Signer } from "@x402/stellar";
-import { UptoStellarScheme as UptoFacilitator } from "x402-upto-stellar/upto/facilitator";
+import { UptoStellarScheme as UptoFacilitator } from "@codekaya/x402-upto-stellar/upto/facilitator";
 
 const facilitator = new UptoFacilitator([createEd25519Signer(facilitatorSecret, "stellar:testnet")]);
 

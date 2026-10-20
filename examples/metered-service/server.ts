@@ -18,8 +18,8 @@ import {
 } from "@x402/core/http";
 import type { PaymentRequired } from "@x402/core/types";
 import { createEd25519Signer } from "@x402/stellar";
-import { UptoStellarScheme as UptoFacilitator } from "x402-upto-stellar/upto/facilitator";
-import { UptoStellarScheme as UptoServer } from "x402-upto-stellar/upto/server";
+import { UptoStellarScheme as UptoFacilitator } from "@codekaya/x402-upto-stellar/upto/facilitator";
+import { UptoStellarScheme as UptoServer } from "@codekaya/x402-upto-stellar/upto/server";
 
 import { EXPLORER, NETWORK, RPC_URL, account, submit, trustUsdc, usdc } from "./setup.js";
 

@@ -6,8 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w x402-upto-stellar",
-    "test": "npm test -w x402-upto-stellar",
-    "typecheck": "npm run typecheck -w x402-upto-stellar"
+    "build": "npm run build -w @codekaya/x402-upto-stellar",
+    "test": "npm test -w @codekaya/x402-upto-stellar",
+    "typecheck": "npm run typecheck -w @codekaya/x402-upto-stellar"
   }
 }

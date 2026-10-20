@@ -17,7 +17,7 @@ Built under a Stellar Türkiye Instaward. Testnet only, not audited.
 | **D1** Discovery registry contract | [`contracts/registry`](contracts/registry) |
 | **D2** Facilitator: verify and settle | [`packages/x402-upto-stellar/src/upto/facilitator`](packages/x402-upto-stellar/src/upto/facilitator) |
 | **D2** Conformance vectors and runner | [`conformance`](conformance) |
-| **D3** Client and server, npm package `x402-upto-stellar` | [`packages/x402-upto-stellar`](packages/x402-upto-stellar) |
+| **D3** Client and server, npm package [`@codekaya/x402-upto-stellar`](https://www.npmjs.com/package/@codekaya/x402-upto-stellar) | [`packages/x402-upto-stellar`](packages/x402-upto-stellar) |
 | **D3** Metered inference service and paying agent | [`examples/metered-service`](examples/metered-service) |
 | Scheme specification, x402 v2 | [`specs/scheme_upto_stellar.md`](specs/scheme_upto_stellar.md) |
 

@@ -11,8 +11,8 @@
 import { decodePaymentRequiredHeader, decodePaymentResponseHeader, encodePaymentSignatureHeader } from "@x402/core/http";
 import { x402Client } from "@x402/core/client";
 import { createEd25519Signer } from "@x402/stellar";
-import { balanceOf } from "x402-upto-stellar";
-import { UptoStellarScheme } from "x402-upto-stellar/upto/client";
+import { balanceOf } from "@codekaya/x402-upto-stellar";
+import { UptoStellarScheme } from "@codekaya/x402-upto-stellar/upto/client";
 
 import { EXPLORER, NETWORK, PASSPHRASE, USDC, account, buyUsdc, server, submit, trustUsdc, usdc } from "./setup.js";
 

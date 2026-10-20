@@ -1,5 +1,5 @@
 {
-  "name": "x402-upto-stellar",
+  "name": "@codekaya/x402-upto-stellar",
   "version": "0.1.0",
   "description": "The x402 `upto` payment scheme for Stellar: client, server and facilitator, mirroring @x402/stellar",
   "license": "Apache-2.0",
