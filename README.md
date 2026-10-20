@@ -11,6 +11,8 @@ and SVM specifications; this repository supplies the Stellar one.
 
 Built under a Stellar Türkiye Instaward. Testnet only, not audited.
 
+**Reviewing the award? Start at [EVIDENCE.md](EVIDENCE.md)**: every evidence item from the Statement of Work, in order, with its link.
+
 | Piece | Where |
 |---|---|
 | Settlement contract (dependency, live before the sprint) | [`contracts/upto`](contracts/upto) |
