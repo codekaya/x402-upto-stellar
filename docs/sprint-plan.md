@@ -1,8 +1,8 @@
 # Sprint plan
 
-Instaward sprint, 10 November to 9 December 2026. Three deliverables: a
-self-verifying deployment registry, a facilitator with a conformance suite, and
-a client package with a live metered service.
+Instaward sprint, 30 days from 10 November 2026. This plan follows the accepted
+Statement of Work exactly: three deliverables, 100 hours, eleven success
+criteria checked on day 30.
 
 The settlement contract is live on testnet at
 `CCDHT7LJMEMF5MFWBDIOE62EZTQ64QQ47NEGKMG7E6SCU433O67VVXQB` and is a dependency,
@@ -11,161 +11,178 @@ not part of this sprint.
 ## Where the work slots in
 
 `@x402/stellar` (2.28.0 on npm) publishes exactly three entry points:
+`exact/client`, `exact/facilitator`, `exact/server`. That is the shape to
+mirror. This sprint produces the `upto` side of the same split, plus the
+registry contract underneath it, which `exact` has no equivalent of because it
+trusts the contract address written into the 402 response.
 
-```
-@x402/stellar/exact/client
-@x402/stellar/exact/facilitator
-@x402/stellar/exact/server
-```
-
-That is the shape to mirror. The sprint produces the `upto` triplet with the
-same split, plus the registry contract underneath it:
-
-| This sprint | Mirrors |
-|---|---|
-| `upto/facilitator` — verify and settle | `exact/facilitator` |
-| `upto/client` — payload, signing, `X-PAYMENT` | `exact/client` |
-| `upto/server` — 402 response with an `upto` accepts entry | `exact/server` |
-| registry contract | nothing yet; `exact` trusts the address in the 402 |
-
-Publishing goes to our own scope first. An upstream pull request is deliberately
-**not** a deliverable: Instawards rules forbid deliverables that depend on
-outside maintainers. It happens after the sprint, on its own timeline.
+Publishing goes to our own scope. An upstream pull request is deliberately not
+a deliverable, because a deliverable may not depend on outside maintainers. It
+happens after the sprint.
 
 ## Before day 1: three spikes
 
-These are the only real unknowns. Each is a few hours and each one, if it
-fails, changes the plan. Do them before 10 November, not inside the sprint.
+The only real unknowns. A few hours each, and each one changes the plan if it
+fails. They belong before 10 November, not inside the sprint.
 
-### Spike 1 — off-chain authorization signing (the critical one)
+**Spike 1, the critical one. Two signers in one transaction.** Sign a
+`settle_signed` payload as the payer in TypeScript with `authorizeEntry`,
+submit it as the settler, against the live contract. The payer signs the
+payload and deliberately not the settled amount, so the transaction carries the
+payer's authorization entry and the settler's own signature.
 
-Sign a `settle_signed` payload as the payer in TypeScript, submit it as the
-settler, against the live contract. The payer signs the payload but not the
-settled amount, so two different signers appear in one transaction.
+Target: one settlement on testnet where the payee is paid, the remainder
+returns to the payer, and neither signer could have changed the other's half.
 
-- `authorizeEntry` from `@stellar/stellar-sdk` for the payer's entry
-- the settler signs the transaction itself
-- target: one successful settlement on testnet with a refund
+If it fails, the one-shot HTTP path is unreachable from a browser or an agent
+and the sprint pivots to the session path: the payer submits `lock` themselves
+and the facilitator only calls `settle`. All three deliverables survive; the
+client gets simpler and the facilitator gains an endpoint.
 
-**If this fails**, the one-shot HTTP path is not reachable from a browser or an
-agent, and the sprint pivots to the session path: the payer submits `lock`
-themselves and the facilitator only calls `settle`. Deliverables survive, the
-client gets simpler, the facilitator gets one more endpoint.
+**Spike 2. Reading the network identity inside a contract.** Confirm
+`env.ledger().network_id()` is what a record should be keyed against, so a
+record admitted on one network refuses to resolve on another. This is one of
+the three negative cases the award is checked against.
 
-### Spike 2 — the admission probe
+**Spike 3. The ground rules.** Read `exact/client` and `exact/facilitator` and
+write down the interfaces to mirror. Pick the settlement token on testnet: the
+published USDC SAC if it is usable, otherwise deploy a test SAC and say so.
+Stand up the local model the metered demo will proxy, so the meter has
+something real to count without paid credits.
 
-A throwaway Soroban test that calls another contract's view with
-`env.try_invoke_contract` and handles the case where the target has no such
-function or traps. This is the mechanism the registry is built on.
+## Deliverable 1, registry contract, 28 hours
 
-**If this fails**, fall back to probing at read time: the registry stores
-candidate addresses and the resolution view runs the probe before answering, so
-an address that stops matching stops resolving.
+A Soroban contract that answers: for this network and token, which `upto`
+deployment is canonical?
 
-### Spike 3 — the ground rules
+| Piece | Shape |
+|---|---|
+| Storage | persistent record keyed by token address, carrying the deployment address and the network id it was registered under |
+| Write path | `register` behind `require_auth` of a stored admin address, with the key policy documented in the README |
+| Read path | `resolve(token)` returning the deployment, refusing when the stored network id is not the ledger's own |
+| Errors | typed, one per refusal reason |
+| Events | emitted on every registration and change |
+| TTL | records bumped on access, documented |
 
-- Read `exact/client` and `exact/facilitator` in `@x402/stellar` and write down
-  the interfaces to mirror.
-- Pick the settlement token on testnet: the published USDC SAC if it is usable,
-  otherwise deploy a test SAC and say so in the README.
-- Pick what the metered service actually meters. It must be free to run and
-  deterministic: units served, bytes returned, rows queried. Nothing that needs
-  paid model credits.
+Three negative cases, each one a published transaction:
+
+1. resolving a token that was never registered fails
+2. a record registered under another network id does not resolve
+3. a write from an address that is not the admin is rejected
+
+Finishes with the contract deployed to testnet, the contract ID in the README,
+and a measured resource profile for registration and resolution.
+
+## Deliverable 2, facilitator and conformance suite, 40 hours
+
+**Verification**, in the spec's cheapest-first order, each failure returning its
+specified reason:
+
+scheme and network, payload contract against the advertised contract, payee and
+token, cap against the advertised minimum, resource match, validity window,
+signature shape, replay state through `is_consumed`, payer balance, and finally
+a simulated `settle_signed` at zero, which checks authorization and solvency
+without committing to a price.
+
+**The registry check**: a payload naming a contract address that does not
+resolve through Deliverable 1 is refused before anything else happens.
+
+**Settlement**: submit, return the transaction hash, map every contract error to
+its x402 reason:
+
+| Contract error | Reason |
+|---|---|
+| `AlreadyConsumed` | `invalid_payment` |
+| `Expired`, `NotYetValid` | `invalid_timing` |
+| `AmountOutOfRange` | `invalid_amount` |
+| `InvalidMaxAmount`, `InvalidValidityWindow`, `ValidityWindowTooLong`, `PayerIsPayee` | `invalid_payment_requirements` |
+| host authorization failure | `invalid_signature` |
+| token transfer failure | `insufficient_funds` |
+
+A failed settlement is never retried with a different amount: the first
+successful call consumes the id permanently.
+
+**Conformance vectors**: a published suite of valid and invalid payloads with
+their expected outcomes, and a runner that executes them against a given
+deployment and prints one line per case.
+
+## Deliverable 3, client package and metered service, 32 hours
+
+**Client**: payload construction, authorization-entry signing, id derivation
+through the contract view, registry lookup, `X-PAYMENT` encoding. Published to
+npm at v0.1.0 with types, tests and a README.
+
+**Metered service**: a proxy in front of a locally hosted model that answers 402
+with an `upto` entry, serves the request, counts the tokens it actually
+produced, and is settled for that count below the authorized cap, with the
+remainder returning to the payer.
+
+**Recording**: three minutes, the whole cycle, ending on the settlement
+transaction in a block explorer.
 
 ## The 30 days
 
-Hour budget is 100, roughly 25 per week. Two days are already spoken for by
-Pacta gates (13 and 27 November), so they are left empty here.
+25 hours a week, four weeks.
 
-### Week 1, 10 to 16 November — registry contract (28 h)
-
-| Day | Work | Done when |
+| Week | Work | Output |
 |---|---|---|
-| 10–11 Nov | Contract skeleton: storage model for records, resolution view, typed errors, events. Port the id derivation so the registry can compute the expected answer itself. | `make test` green on the happy path |
-| 12 Nov | The admission probe: call the candidate's derivation view with a fixed vector, compare, record or refuse. | A wrong-answer candidate is refused in a test |
-| 13 Nov | *Pacta gate, no sprint work* | |
-| 14 Nov | Negative tests: wrong answer refused, unregistered address does not resolve, a record admitted for one network does not resolve on another. TTL strategy for records. | Three negative tests green |
-| 15–16 Nov | Deploy to testnet, publish the contract ID, measure the resource profile for admission and resolution, write the contract README including the stated limitation of the probe. | Contract ID in the README, first admission and resolution transactions public |
+| 1 | Registry: storage, write path, resolution, errors, events, TTL. Negative tests. Deploy, resource profile, README. | Contract ID published, first registration and resolution on-chain, three rejection transactions |
+| 2 | Package scaffold mirroring `exact/*`. Verification through the full check order, ending in the zero simulation. Registry check. First conformance vectors. | Every specified reason reproduced against a bad payload |
+| 3 | Settlement with the full error mapping and the no-retry rule. Conformance runner. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network, suite passing |
+| 4 | Client, signing paths, npm publish. Metered service and the full cycle. Recording and evidence pack. | npm v0.1.0, metered settlement below the cap, recording |
 
-**Week 1 evidence:** contract ID, one admission tx, one resolution tx, three
-rejection txs, resource profile committed.
+## Evidence, captured the day it happens
 
-### Week 2, 17 to 23 November — facilitator verify (20 h)
+One table in the README, appended as each transaction lands. Chasing eight
+hashes on day 30 is the most avoidable hour of the sprint.
 
-| Day | Work | Done when |
-|---|---|---|
-| 17–18 Nov | Package scaffold mirroring `exact/*`. Verification: the cheapest-first check order from the spec, each failing case returning its specified reason. | Each reason returned against a hand-written bad payload |
-| 19 Nov | The registry check: refuse a payload whose contract address does not resolve. | Refusal covered by a test |
-| 20–21 Nov | Finish verification with the simulated settlement at zero against the live contract. Draft the conformance vectors from the spec tables. | Simulation path working, first vectors committed |
+| What | Tx |
+|---|---|
+| Registry registration | |
+| Registry resolution | |
+| Rejected: unregistered token | |
+| Rejected: wrong network | |
+| Rejected: non-admin write | |
+| Verification simulation | |
+| Settlement with refund | |
+| Metered settlement below the cap | |
 
-**Week 2 evidence:** verification output table, vectors in the repository.
+## Day 30 checklist
 
-### Week 3, 24 to 30 November — settle and the conformance runner (20 h)
+The eleven criteria the award is measured against:
 
-| Day | Work | Done when |
-|---|---|---|
-| 24 Nov | Settlement: submit, return the transaction hash, map every contract error to its x402 reason. Mid-sprint demo with the Chapter Lead. | A settlement hash from the live network |
-| 25–26 Nov | The no-retry rule, error mapping tests, edge cases. | Every mapped error reproduced in a test |
-| 27 Nov | *Pacta gate, no sprint work* | |
-| 28–30 Nov | The conformance runner: executes the vector suite against a given deployment and prints one line per case. | Full suite passing against testnet |
+- [ ] Registry deployed, contract ID in the README
+- [ ] A resolution call returns the canonical deployment, visible in an explorer
+- [ ] All three negative cases fail as specified, each with a published hash
+- [ ] Test suite and resource profile committed, CI green
+- [ ] Verification returns the correct reason for every malformed payload
+- [ ] Settlement returns a hash on success and the mapped reason on each error
+- [ ] A payload failing the registry check is refused
+- [ ] The conformance runner reports every case passing against testnet
+- [ ] Client package published at v0.1.0 with types, tests and README
+- [ ] The metered service completes a cycle below the cap, hash published
+- [ ] The three-minute recording shows that cycle end to end
 
-**Week 3 evidence:** settlement tx, runner output in the repository.
+## Chapter obligations, not billed
 
-### Week 4, 1 to 9 December — client, metered service, evidence (32 h)
-
-| Day | Work | Done when |
-|---|---|---|
-| 1–2 Dec | Client: payload construction, authorization-entry signing, id derivation through the contract view, registry lookup, `X-PAYMENT` encoding. | A payment produced from the package alone |
-| 3 Dec | Signing paths: Stellar Wallets Kit for a browser payer, local key for a server-side one. | Both paths exercised |
-| 4–5 Dec | The metered service: 402 with an `upto` entry, serve, count units, settle for that count below the ceiling. | A full cycle on testnet with the refund visible |
-| 6–7 Dec | npm publish at v0.1.0 with types, tests and README. Developer documentation. | Package installable from a clean directory |
-| 8–9 Dec | Evidence pack: the transaction table, the runner output, a short screen recording of the cycle. Final review against the success criteria. | Every success criterion ticked |
-
-**Week 4 evidence:** npm link, metered settlement tx below the ceiling,
-recording, and a clean-room run where only the published package is used.
-
-## Evidence discipline
-
-Capture as you go, not at the end. One table in the repository README, appended
-the day each transaction happens:
-
-| What | Network | Tx |
-|---|---|---|
-| Registry admission | testnet | |
-| Registry resolution | testnet | |
-| Rejected: wrong derivation | testnet | |
-| Rejected: unregistered address | testnet | |
-| Rejected: wrong network | testnet | |
-| Verification simulation | testnet | |
-| Settlement with refund | testnet | |
-| Metered settlement below ceiling | testnet | |
-
-A transaction that is not in this table on the day it happens is a transaction
-that will be hunted for on day 30.
-
-## Chapter obligations
-
-- Weekly progress update in the Stellar Türkiye channel, every Monday.
-- Mid-sprint check-in and live demo with the Chapter Lead, 24 November.
-- End-of-sprint review against the success criteria, plus a short session on
-  charging for a metered API on Stellar.
-
-None of this is billed.
+Weekly progress update in the Stellar Türkiye channel. Mid-sprint check-in and
+live demo with the Chapter Lead around day 15. End-of-sprint review against the
+success criteria, plus a short session on charging for a metered API on
+Stellar.
 
 ## Risks
 
 | Risk | Signal | Response |
 |---|---|---|
-| Off-chain authorization signing does not work as specified | Spike 1 fails before the sprint | Pivot to the session path; the payer submits `lock`, the facilitator settles |
-| The admission probe traps in a way that cannot be caught | Spike 2 fails | Probe at read time instead of write time |
-| Week 3 slips | Runner not green by 30 November | Narrow the runner to this deployment rather than any deployment; keep the vectors published |
-| Pacta work bleeds into sprint days | Two gates missed or moved | The gates are fixed; sprint work moves, and the Chapter Lead is told early rather than on day 30 |
+| Off-chain authorization signing does not work as specified | Spike 1 fails | Pivot to the session path; the payer submits `lock`, the facilitator settles |
+| Network identity is not readable or not stable | Spike 2 fails | Key records by an explicit network tag supplied at registration, and document the trust that places in the admin |
+| Week 3 slips | Runner not green by the end of week 3 | Narrow the runner to this deployment rather than any deployment; the vectors still publish |
+| The metered demo needs more than the hardware available | Model too large to serve | Meter a cheaper unit: bytes returned from a local data service, same payment path |
 
 ## After the sprint
 
-- Upstream: propose the Stellar `upto` specification next to the EVM and SVM
-  ones, and the triplet to `@x402/stellar`. Not a sprint deliverable.
-- Follow-on Instaward if the chapter judges the sprint delivered. The lifetime
-  cap across Instawards is $15,000.
-- Developer tooling of this kind is supported through the RFP Track and the
-  Public Goods Award rather than a Build Award.
+Propose the Stellar `upto` specification upstream next to the EVM and SVM ones,
+and the triplet to `@x402/stellar`. A follow-on Instaward is possible if the
+chapter judges this one delivered; the lifetime cap across Instawards is
+$15,000. Developer tooling of this kind is supported through the RFP Track and
+the Public Goods Award.
