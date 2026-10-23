@@ -29,6 +29,13 @@ const MODEL = process.env.MODEL ?? "qwen2.5:0.5b";
 const CAP = process.env.CAP ?? "$0.05";
 /** 0.0001 USDC per output token, in atomic units. */
 const PRICE_PER_TOKEN = BigInt(process.env.PRICE_PER_TOKEN ?? 1_000);
+/**
+ * The facilitator's fee ceiling, in stroops of XLM it pays itself. Soroban rent
+ * is priced dynamically: a settlement cost about 36,000 stroops on 20 October
+ * and 136,000 on 23 October. 0.1 XLM leaves room for that and still refuses a
+ * settlement that would pay to restore archived state, which costs whole XLM.
+ */
+const MAX_FEE_STROOPS = Number(process.env.MAX_FEE_STROOPS ?? 1_000_000);
 
 // The facilitator runs in-process: it verifies, and settles as the transaction source.
 const facilitatorAccount = await account(process.env.FACILITATOR_SECRET);
@@ -37,7 +44,10 @@ if (payeeAccount.fresh) {
   const hash = await submit(payeeAccount.keypair, [trustUsdc()]);
   console.log(`payee USDC trustline ${EXPLORER}/${hash}`);
 }
-const facilitator = new UptoFacilitator([createEd25519Signer(facilitatorAccount.keypair.secret(), NETWORK)], { rpcUrl: RPC_URL });
+const facilitator = new UptoFacilitator([createEd25519Signer(facilitatorAccount.keypair.secret(), NETWORK)], {
+  rpcUrl: RPC_URL,
+  maxTransactionFeeStroops: MAX_FEE_STROOPS,
+});
 const scheme = new UptoServer();
 
 const { asset, amount } = await scheme.parsePrice(CAP, NETWORK);
@@ -82,7 +92,7 @@ async function handle(req: IncomingMessage, res: ServerResponse) {
   const payment = decodePaymentSignatureHeader(header);
   const verified = await facilitator.verify(payment, requirements);
   if (!verified.isValid) {
-    console.log(`refused ${verified.invalidReason}`);
+    console.log(`refused ${verified.invalidReason}${verified.invalidMessage ? `: ${verified.invalidMessage.split("\n")[0]}` : ""}`);
     return send(res, 402, { ...paymentRequired, error: verified.invalidReason }, {
       "PAYMENT-REQUIRED": encodePaymentRequiredHeader({ ...paymentRequired, error: verified.invalidReason }),
     });

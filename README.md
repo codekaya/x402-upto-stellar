@@ -188,6 +188,13 @@ Every testnet transaction this project produces, appended the day it lands.
 | 2026-10-20 | D3 setup: metered service payee USDC trustline | [`a56e0932…`](https://stellar.expert/explorer/testnet/tx/a56e09325370c2fd1af0a85777d748f9af427c7e2b32f70ef906c458d95abd41) |
 | 2026-10-20 | D3 setup: agent payer USDC trustline and DEX purchase | [`7551be20…`](https://stellar.expert/explorer/testnet/tx/7551be208417de26646b452c5dbfc9f33f8bbf2533f7040d401a151c33171a8c) |
 | 2026-10-20 | D3 **metered settlement below the cap**: 35 tokens of qwen2.5:0.5b, 0.0035 of a 0.05 USDC cap, 0.0465 returned | [`1630e707…`](https://stellar.expert/explorer/testnet/tx/1630e707676f99119fa516ae7a7112d266528eafaebb7f7efa5fba7b4dbb2128) |
+| 2026-10-23 | Demo rehearsal 1 setup: payee USDC trustline. Verify then refused the payment with `fee_exceeds_maximum`, a simulation, so no settlement | [`9b4de969…`](https://stellar.expert/explorer/testnet/tx/9b4de9697114bb4738473ae5f2177e1d2634e96b6fe9e4e1d5a26277eee28345) |
+| 2026-10-23 | Demo rehearsal 1 setup: payer USDC trustline and DEX purchase | [`369355fb…`](https://stellar.expert/explorer/testnet/tx/369355fb0b6f8d0fd9951f8b693e43d5819332b56782eb8fb998998e5e940d60) |
+| 2026-10-23 | Demo rehearsal 2 setup: payee USDC trustline. Refused again; the simulated fee was 136,326 stroops against the 50,000 ceiling | [`c14b55aa…`](https://stellar.expert/explorer/testnet/tx/c14b55aac873e10f7d1777288c09d6213554b4183fc3e9162557350b4b0d7085) |
+| 2026-10-23 | Demo rehearsal 2 setup: payer USDC trustline and DEX purchase | [`59930683…`](https://stellar.expert/explorer/testnet/tx/59930683dd37c85003db63e012ba0e00f6123e9d87df5f543852ec997331974e) |
+| 2026-10-23 | Demo rehearsal 3 setup: payee USDC trustline, facilitator ceiling raised to 0.1 XLM | [`74452dfa…`](https://stellar.expert/explorer/testnet/tx/74452dfa4e12c934be5b92d8c8701e048ac644c56231fef16cab4664cfb7a50c) |
+| 2026-10-23 | Demo rehearsal 3 setup: payer USDC trustline and DEX purchase | [`f06cb51c…`](https://stellar.expert/explorer/testnet/tx/f06cb51ce29f1c70074541ad20a22569a10753ccadeea17be549dd1f96deb943) |
+| 2026-10-23 | Demo rehearsal 3 **metered settlement**: 52 tokens, 0.0052 of a 0.05 USDC cap, 0.0448 returned | [`36cd955d…`](https://stellar.expert/explorer/testnet/tx/36cd955d3718a3b52b29463621aa240e9348db1a59d52d2801f33851a796f8eb) |
 
 Not logged: the setup transactions (throwaway accounts' USDC trustlines and DEX
 purchases) of conformance run 1 and of one single-case debugging run, both on

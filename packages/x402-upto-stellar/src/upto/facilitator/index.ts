@@ -44,7 +44,7 @@ export interface UptoFacilitatorOptions {
   rpcUrl?: string;
   /** Registry that names canonical deployments. Defaults to the known one; `false` skips the check. */
   registry?: string | false;
-  /** Refuse a settlement whose simulated fee exceeds this. Default 50,000 stroops, as `exact`. */
+  /** Refuse a settlement whose simulated fee exceeds this. Default 1,000,000 stroops, 0.1 XLM. */
   maxTransactionFeeStroops?: number;
   /** Inclusion fee bid on top of the resource fee. Default 100 stroops. */
   inclusionFeeStroops?: number;

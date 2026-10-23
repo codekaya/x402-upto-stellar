@@ -372,8 +372,11 @@ Notes on the checks that are not self-explanatory:
   archived when their TTL lapses, and a transaction touching them restores them
   automatically at many times the normal fee. On testnet one such settlement
   cost 11.44 XLM against 0.003 XLM warm. A facilitator should refuse rather
-  than pay that silently; `exact` defaults its ceiling to 50,000 stroops, which
-  a warm `upto` settlement fits.
+  than pay that silently. The ceiling must still leave room for ordinary fees,
+  which move: Soroban rent is priced dynamically, and the same warm settlement
+  cost about 36,000 stroops on 20 October 2026 and 136,000 on 23 October.
+  `exact`'s default of 50,000 is too tight for a scheme that writes a replay
+  marker; the reference facilitator defaults to 0.1 XLM.
 
 ### Settle
 

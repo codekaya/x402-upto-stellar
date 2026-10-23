@@ -76,7 +76,7 @@ const settlement = await facilitator.settle(payment, { ...requirements, amount: 
 ```
 
 Options: `rpcUrl`, `registry` (an address, or `false` to skip the canonical
-check), `maxTransactionFeeStroops` (default 50,000), `inclusionFeeStroops`,
+check), `maxTransactionFeeStroops` (default 1,000,000, i.e. 0.1 XLM), `inclusionFeeStroops`,
 `registryCacheSeconds`.
 
 Behaviour worth knowing:

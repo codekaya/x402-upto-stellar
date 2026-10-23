@@ -12,8 +12,14 @@ export const CLOCK_ALLOWANCE_SECONDS = 60;
 /** Nominal ledger close time, used to size signature expiry. */
 export const LEDGER_SECONDS = 5;
 
-/** Fee ceiling for a settlement, as in `exact`. A warm settle_signed costs about 30,000. */
-export const DEFAULT_MAX_TRANSACTION_FEE_STROOPS = 50_000;
+/**
+ * Fee ceiling for a settlement, 0.1 XLM. Soroban rent is priced dynamically: a
+ * warm settle_signed cost about 36,000 stroops on testnet on 20 October 2026 and
+ * 136,000 on 23 October, so `exact`'s 50,000 is too tight for a scheme that
+ * writes a replay marker. 0.1 XLM still refuses a settlement that would pay to
+ * restore archived state, which costs whole XLM.
+ */
+export const DEFAULT_MAX_TRANSACTION_FEE_STROOPS = 1_000_000;
 
 export interface UptoDeployment {
   /** The canonical `upto` escrow contract. */
